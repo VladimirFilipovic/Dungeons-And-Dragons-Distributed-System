@@ -1,0 +1,7 @@
+include 'character-service'
+include 'spells-service'
+include 'stats-service'
+include 'character-composite'
+include 'inventory-service'
+include 'api'
+include 'utils'
