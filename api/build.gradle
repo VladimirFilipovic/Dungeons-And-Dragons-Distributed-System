@@ -14,10 +14,19 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
-	implementation 'org.springframework.boot:spring-boot-starter-web:3.0.0'
+	implementation 'org.springframework:spring-web:6.0.2'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
+//tasks.named('test') {
+//	useJUnitPlatform()
+//}
+
+bootJar {
+	enabled = false
+}
+
+jar {
+	enabled = true
 }
