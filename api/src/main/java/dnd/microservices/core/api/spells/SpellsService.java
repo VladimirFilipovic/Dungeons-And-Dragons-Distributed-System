@@ -17,5 +17,8 @@ public interface SpellsService {
             produces = "application/json"
     )
     Spell getSpell(@PathVariable String spellName);
+    
+    void assignSpellToCharacter(String spellName, String characterName);
+    void unAssignSpellFromCharacter(String spellName, String characterName);
 
 }

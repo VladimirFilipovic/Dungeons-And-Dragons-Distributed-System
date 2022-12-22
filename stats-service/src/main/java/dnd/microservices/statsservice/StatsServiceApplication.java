@@ -1,9 +1,11 @@
-package dnd.microservices.core.stats;
+package dnd.microservices.statsservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
+@ComponentScan("dnd.microservices")
 public class StatsServiceApplication {
 
 	public static void main(String[] args) {

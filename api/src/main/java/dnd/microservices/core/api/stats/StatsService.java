@@ -5,9 +5,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
-public interface StatsInterface {
+public interface StatsService {
     @GetMapping(
-            value = "/stats/{statisticName}",
+            value = "/statisc/{statisticName}",
             produces = "application/json"
     )
     Statistic getStatistic(@PathVariable String statisticName);
@@ -17,4 +17,6 @@ public interface StatsInterface {
             produces = "application/json"
     )
     List<Statistic> getStats();
+
+    public void changeCharacterStats(String characterName, String statisticName, Integer newValue);
 }

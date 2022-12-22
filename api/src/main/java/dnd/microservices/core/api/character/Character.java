@@ -29,7 +29,6 @@ public class Character {
         return serviceAddress;
     }
 
-
     public Character(String id, String name, String race, String religion, String serviceAddress) {
         this.id = id;
         this.name = name;
@@ -37,6 +36,5 @@ public class Character {
         this.religion = religion;
         this.serviceAddress = serviceAddress;
     }
-
 
 }

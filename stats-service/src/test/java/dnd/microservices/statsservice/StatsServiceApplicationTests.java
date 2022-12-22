@@ -1,10 +1,10 @@
-package dnd.microservices.core.spells;
+package dnd.microservices.statsservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SpellsServiceApplicationTests {
+class StatsServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

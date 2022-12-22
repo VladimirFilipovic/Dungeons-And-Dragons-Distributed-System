@@ -10,4 +10,7 @@ public interface ItemsService {
             produces = "application/json"
     )
     Item getItem(@PathVariable String itemName);
+
+    void addItemToInventory(String itemName, String inventoryId);
+    void removeItemFromInventory(String itemName, String inventoryId);
 }
