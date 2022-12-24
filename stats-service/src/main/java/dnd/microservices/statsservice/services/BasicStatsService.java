@@ -29,12 +29,14 @@ public class BasicStatsService implements StatsService {
     }
 
     /**
+     * @param characterName
      * @return
      */
     @Override
-    public List<Statistic> getStats() {
-        return new ArrayList();
+    public List<Statistic> getStats(String characterName) {
+       return new ArrayList<>();
     }
+
 
     /**
      * @param characterName
