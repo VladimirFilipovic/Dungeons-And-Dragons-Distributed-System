@@ -1,13 +1,13 @@
-package dnd.microservices.core.charactercompositeservice;
+package dnd.microservices.charactercompositeservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class UtilsApplication {
+public class CharacterCompositeServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(UtilsApplication.class, args);
+		SpringApplication.run(CharacterCompositeServiceApplication.class, args);
 	}
 
 }

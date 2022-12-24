@@ -1,10 +1,10 @@
-package dnd.microservices.core.charactercompositeservice;
+package dnd.microservices.charactercompositeservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class UtilsApplicationTests {
+class CharacterCompositeServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

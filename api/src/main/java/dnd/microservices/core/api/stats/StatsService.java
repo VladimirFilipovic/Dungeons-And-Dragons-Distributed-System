@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface StatsService {
     @GetMapping(
-            value = "/statisc/{statisticName}",
+            value = "/stats/{statisticName}",
             produces = "application/json"
     )
     Statistic getStatistic(@PathVariable String statisticName);
