@@ -9,13 +9,24 @@ import dnd.microservices.core.api.spells.Spell;
 import dnd.microservices.core.api.spells.SpellsService;
 import dnd.microservices.core.api.stats.Statistic;
 import dnd.microservices.core.api.stats.StatsService;
+import dnd.microservices.core.utils.exceptions.InvalidInputException;
+import dnd.microservices.core.utils.exceptions.NotFoundException;
+import dnd.microservices.core.utils.http.HttpErrorInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 
+import java.io.IOException;
 import java.util.List;
 
 @Component
@@ -60,7 +71,28 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public Character getCharacter(String characterName) {
-        return null;
+        try {
+            String requestUrl = characterServiceUrl + characterName;
+            LOG.debug("Will call Character API on URL: {}", requestUrl);
+
+            Character character = restTemplate.getForObject(requestUrl, Character.class);
+            LOG.debug("Found a product with id: {}", character.getId());
+
+            return character;
+
+
+        } catch (HttpClientErrorException ex) {
+
+            HttpStatusCode statusCode = ex.getStatusCode();
+            if (statusCode.equals(NOT_FOUND)) {
+                throw new NotFoundException(getErrorMessage(ex));
+            } else if (statusCode.equals(UNPROCESSABLE_ENTITY)) {
+                throw new InvalidInputException(getErrorMessage(ex));
+            }
+            LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+            LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+            throw ex;
+        }
     }
 
     /**
@@ -69,7 +101,15 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public List<Item> getItems(String characterName) {
-        return null;
+        String requestUrl = itemsServiceUrl + characterName;
+        List<Item> items = restTemplate.exchange(
+                requestUrl,
+                GET,
+                null,
+                new ParameterizedTypeReference<List<Item>>() {}
+        ).getBody();
+
+        return  items;
     }
 
     /**
@@ -78,7 +118,10 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public Item getItem(String itemName) {
-        return null;
+        String requestUrl = itemsServiceUrl + itemName;
+        Item item = restTemplate.getForObject(requestUrl, Item.class);
+
+        return item;
     }
 
     /**
@@ -87,7 +130,7 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public void addItemToInventory(String itemName, String inventoryId) {
-
+        throw new Error("not implemented");
     }
 
     /**
@@ -96,7 +139,7 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public void removeItemFromInventory(String itemName, String inventoryId) {
-
+        throw new Error("not implemented");
     }
 
     /**
@@ -105,7 +148,15 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public List<Spell> getSpells(String characterName) {
-        return null;
+        String requestUrl = spellsServiceUrl + characterName;
+        List<Spell> spells = this.restTemplate.exchange(
+                requestUrl,
+                GET,
+                null,
+                new ParameterizedTypeReference<List<Spell>>() {}
+        ).getBody();
+
+        return spells;
     }
 
     /**
@@ -114,7 +165,10 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public Spell getSpell(String spellName) {
-        return null;
+        String requestUrl = spellsServiceUrl + spellName;
+        Spell spell = this.restTemplate.getForObject(requestUrl, Spell.class);
+
+        return  spell;
     }
 
     /**
@@ -123,7 +177,7 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public void assignSpellToCharacter(String spellName, String characterName) {
-
+        throw new Error("not implemented");
     }
 
     /**
@@ -132,7 +186,7 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public void unAssignSpellFromCharacter(String spellName, String characterName) {
-
+        throw new Error("not implemented");
     }
 
     /**
@@ -141,7 +195,10 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public Statistic getStatistic(String statisticName) {
-        return null;
+        String requestUrl = this.statsServiceUrl + statisticName;
+        Statistic statistic = this.restTemplate.getForObject(requestUrl, Statistic.class);
+
+        return  statistic;
     }
 
     /**
@@ -150,7 +207,15 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public List<Statistic> getStats(String characterName) {
-        return null;
+        String requestUrl = this.statsServiceUrl + characterName;
+        List<Statistic> statistics = this.restTemplate.exchange(
+                requestUrl,
+                GET,
+                null,
+                new ParameterizedTypeReference<List<Statistic>>(){}
+        ).getBody();
+
+        return  statistics;
     }
 
     /**
@@ -160,10 +225,18 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public void changeCharacterStats(String characterName, String statisticName, Integer newValue) {
-
+        throw new Error("not implemented");
     }
 
     private String getServiceUrl(String host, int port, String serviceName) {
-        return "http://" + host + ":" + port + "/product/";
+        return "http://" + host + ":" + port + "/" + serviceName + "/";
+    }
+
+    private String getErrorMessage(HttpClientErrorException ex) {
+        try {
+            return mapper.readValue(ex.getResponseBodyAsString(), HttpErrorInfo.class).getMessage();
+        } catch (IOException ioex) {
+            return ex.getMessage();
+        }
     }
 }

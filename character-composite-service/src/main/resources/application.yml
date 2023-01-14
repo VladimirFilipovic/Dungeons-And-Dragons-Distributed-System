@@ -2,12 +2,12 @@ server.port: 7000
 
 app:
     character-service:
-        host: localhost
-        port: 7001
+      host: localhost
+      port: 7001
     spells-service:
         host: localhost
         port: 7002
-    inventory-service:
+    items-service:
         host: localhost
         port: 7003
     stats-service:
