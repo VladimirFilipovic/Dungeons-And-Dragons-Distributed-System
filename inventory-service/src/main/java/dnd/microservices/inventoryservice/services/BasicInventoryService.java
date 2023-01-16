@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -35,7 +36,11 @@ public class BasicInventoryService implements ItemsService {
      */
     @Override
     public List<Item> getItems(String characterName) {
-        return new ArrayList<>();
+        List<Item> items = new ArrayList<>();
+        items.add(new Item("itemName", "itemName", 100, "Fake item dude", this.serviceUtil.getServiceAddress()));
+        items.add(new Item("itemName", "itemName", 100, "Fake item dude", this.serviceUtil.getServiceAddress()));
+
+        return  items;
     }
 
     /**

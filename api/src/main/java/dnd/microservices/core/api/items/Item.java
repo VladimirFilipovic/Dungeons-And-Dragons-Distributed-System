@@ -35,4 +35,11 @@ public class Item {
         this.serviceAdress = serviceAdress;
     }
 
+    public Item() {
+        this.id = null;
+        this.name = null;
+        this.amount = 0;
+        this.description = null;
+        this.serviceAdress = null;
+    }
 }

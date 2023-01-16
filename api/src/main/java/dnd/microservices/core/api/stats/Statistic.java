@@ -30,4 +30,11 @@ public class Statistic {
         this.value = value;
         this.serviceAddress = serviceAddress;
     }
+
+    public Statistic() {
+        this.id = null;
+        this.name = null;
+        this.value = 0;
+        this.serviceAddress =null;
+    }
 }

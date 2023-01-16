@@ -1,5 +1,6 @@
 package dnd.microservices.charactercompositeservice.services;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dnd.microservices.core.api.character.Character;
 import dnd.microservices.core.api.character.CharacterService;
@@ -58,6 +59,7 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
     ) {
         this.restTemplate = restTemplate;
         this.mapper = objectMapper;
+        mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
         this.characterServiceUrl = this.getServiceUrl(characterServiceHost, characterServicePort, "character");
         this.itemsServiceUrl = this.getServiceUrl(itemsServiceHost, itemsServicePort, "items");
         this.spellsServiceUrl = this.getServiceUrl(spellsServiceHost, spellsServicePort, "spells");
@@ -72,7 +74,7 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
     @Override
     public Character getCharacter(String characterName) {
         try {
-            String requestUrl = characterServiceUrl + characterName;
+            String requestUrl = characterServiceUrl + "/" + characterName;
             LOG.debug("Will call Character API on URL: {}", requestUrl);
 
             Character character = restTemplate.getForObject(requestUrl, Character.class);
@@ -101,7 +103,7 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public List<Item> getItems(String characterName) {
-        String requestUrl = itemsServiceUrl + characterName;
+        String requestUrl = itemsServiceUrl + "?characterName=" + characterName;
         List<Item> items = restTemplate.exchange(
                 requestUrl,
                 GET,
@@ -118,7 +120,7 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public Item getItem(String itemName) {
-        String requestUrl = itemsServiceUrl + itemName;
+        String requestUrl = itemsServiceUrl + "/" + itemName;
         Item item = restTemplate.getForObject(requestUrl, Item.class);
 
         return item;
@@ -148,7 +150,7 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public List<Spell> getSpells(String characterName) {
-        String requestUrl = spellsServiceUrl + characterName;
+        String requestUrl = spellsServiceUrl + "?characterName=" + characterName;
         List<Spell> spells = this.restTemplate.exchange(
                 requestUrl,
                 GET,
@@ -165,7 +167,7 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public Spell getSpell(String spellName) {
-        String requestUrl = spellsServiceUrl + spellName;
+        String requestUrl = spellsServiceUrl + "/" + spellName;
         Spell spell = this.restTemplate.getForObject(requestUrl, Spell.class);
 
         return  spell;
@@ -195,7 +197,7 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public Statistic getStatistic(String statisticName) {
-        String requestUrl = this.statsServiceUrl + statisticName;
+        String requestUrl = this.statsServiceUrl + "/" + statisticName;
         Statistic statistic = this.restTemplate.getForObject(requestUrl, Statistic.class);
 
         return  statistic;
@@ -207,7 +209,7 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
      */
     @Override
     public List<Statistic> getStats(String characterName) {
-        String requestUrl = this.statsServiceUrl + characterName;
+        String requestUrl = this.statsServiceUrl + "?characterName=" + characterName;
         List<Statistic> statistics = this.restTemplate.exchange(
                 requestUrl,
                 GET,
@@ -229,7 +231,7 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
     }
 
     private String getServiceUrl(String host, int port, String serviceName) {
-        return "http://" + host + ":" + port + "/" + serviceName + "/";
+        return "http://" + host + ":" + port + "/" + serviceName;
     }
 
     private String getErrorMessage(HttpClientErrorException ex) {

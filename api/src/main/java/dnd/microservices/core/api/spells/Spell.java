@@ -63,5 +63,16 @@ public class Spell {
         this.serviceAdress = serviceAdress;
     }
 
+    public Spell() {
+        this.id =null;
+        this.name = null;
+        this.description =null;
+        this.range = 0;
+        this.duration = null;
+        this.castingTime = null;
+        this.level = 0;
+        this.damageAtLevel = null;
+        this.serviceAdress = null;
 
+    }
 }

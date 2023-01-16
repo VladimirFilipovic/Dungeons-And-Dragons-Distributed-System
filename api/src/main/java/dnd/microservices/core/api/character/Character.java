@@ -37,4 +37,11 @@ public class Character {
         this.serviceAddress = serviceAddress;
     }
 
+    public Character() {
+        this.id = null;
+        this.name = null;
+        this.race = null;
+        this.religion = null;
+        this.serviceAddress = null;
+    }
 }
