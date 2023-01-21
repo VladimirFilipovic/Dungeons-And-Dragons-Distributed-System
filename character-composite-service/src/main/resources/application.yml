@@ -13,3 +13,22 @@ app:
     stats-service:
         host: localhost
         port: 7004
+
+---
+spring.config.activate.on-profile: docker
+
+server.port: 8080
+
+app:
+    character-service:
+        host: character
+        port: 8080
+    spells-service:
+        host: spells
+        port: 8080
+    items-service:
+        host: items
+        port: 8080
+    stats-service:
+        host: stats
+        port: 8080
