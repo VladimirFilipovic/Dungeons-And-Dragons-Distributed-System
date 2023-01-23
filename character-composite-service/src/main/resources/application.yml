@@ -1,3 +1,32 @@
+api:
+    common:
+        version: 1.0.0
+        title: Sample API
+        description: Description of the API...
+        termsOfServiceUrl: MINE TERMS OF SERVICE URL
+        license: License
+        licenseUrl: MY LICENSE URL
+
+        contact:
+            name: Contact
+            url: My
+            email: vlada.19982309@gmail.com
+
+    character-composite:
+        get-character-data:
+            description: Returns a detailed info for the specified character
+            notes: |
+                    # Normal response
+                    If the requested character is found the method will return information regarding:
+                    1. Base character information
+                    2. Stats
+                    3. Spells
+                    4. And, Items
+                    1. Service Addresses\n(technical information regarding the addresses of the microservices that created the response)
+                    # Expected partial and error responses
+                    ## Non-existing character name
+                    404 - A <b>Not Found</b> error will be returned
+
 server.port: 7000
 
 app:

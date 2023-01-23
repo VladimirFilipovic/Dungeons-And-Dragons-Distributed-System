@@ -7,12 +7,19 @@ import dnd.microservices.core.api.items.Item;
 import dnd.microservices.core.api.spells.Spell;
 import dnd.microservices.core.api.stats.Statistic;
 import dnd.microservices.core.utils.http.ServiceUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.List;
 
+@Api(description = "REST API for full character information.")
 @RestController
+@EnableSwagger2
 public class BasicCharacterCompositeService implements CharacterCompositeService {
     private final ServiceUtil serviceUtil;
     private  IntegrationService integration;
@@ -26,10 +33,7 @@ public class BasicCharacterCompositeService implements CharacterCompositeService
         this.integration = integration;
     }
 
-    /**
-     * @param characterName
-     * @return
-     */
+
     @Override
     public CharacterComposite getCharacterData(String characterName) {
         Character character = this.integration.getCharacter(characterName);

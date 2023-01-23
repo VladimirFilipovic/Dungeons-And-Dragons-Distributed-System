@@ -1,28 +1,45 @@
-plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.0.0'
-	id 'io.spring.dependency-management' version '1.1.0'
-
+buildscript {
+	ext {
+		springBootVersion = '2.3.2.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
 }
 
-group = 'dnd.microservices.core.inventory-service'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '19'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+group = 'dnd.microservices.inventory-service'
+version = '1.0.0-SNAPSHOT'
+sourceCompatibility = 1.8
+
+ext {
+	mapstructVersion = "1.3.1.Final"
+}
 
 repositories {
 	mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
-	implementation project(":api")
-	implementation project(":utils")
-	implementation 'org.springframework.boot:spring-boot-starter-web:3.0.0'
-	implementation 'org.springframework:spring-web:6.0.2'
+	implementation project(':api')
+	implementation project(':utils')
+	implementation('org.springframework.boot:spring-boot-starter-actuator')
+	implementation('org.springframework.boot:spring-boot-starter-webflux')
+	implementation('org.springframework.boot:spring-boot-starter-data-mongodb')
+	implementation("org.mapstruct:mapstruct:${mapstructVersion}")
 
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+	testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
+	testImplementation('org.springframework.boot:spring-boot-starter-test')
+	testImplementation('io.projectreactor:reactor-test')
+	testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
 }
-
-//tasks.named('test') {
-//	useJUnitPlatform()
-//}

@@ -17,9 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -85,12 +83,12 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
 
         } catch (HttpClientErrorException ex) {
 
-            HttpStatusCode statusCode = ex.getStatusCode();
-            if (statusCode.equals(NOT_FOUND)) {
-                throw new NotFoundException(getErrorMessage(ex));
-            } else if (statusCode.equals(UNPROCESSABLE_ENTITY)) {
-                throw new InvalidInputException(getErrorMessage(ex));
-            }
+//            HttpStatusCode statusCode = ex.getStatusCode();
+//            if (statusCode.equals(NOT_FOUND)) {
+//                throw new NotFoundException(getErrorMessage(ex));
+//            } else if (statusCode.equals(UNPROCESSABLE_ENTITY)) {
+//                throw new InvalidInputException(getErrorMessage(ex));
+//            }
             LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
             LOG.warn("Error body: {}", ex.getResponseBodyAsString());
             throw ex;
