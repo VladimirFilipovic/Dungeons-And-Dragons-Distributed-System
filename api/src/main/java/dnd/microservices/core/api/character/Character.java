@@ -1,5 +1,7 @@
 package dnd.microservices.core.api.character;
 
+import java.util.List;
+
 public class Character {
 
     private final String id;
@@ -7,6 +9,9 @@ public class Character {
     private final String race;
     private final String religion;
     private final String serviceAddress;
+    private final List<String> items;
+    private final List<String> spells;
+    private final List<String> stats;
 
 
     public String getId() {
@@ -28,14 +33,39 @@ public class Character {
     public String getServiceAddress() {
         return serviceAddress;
     }
+    public List<String> getItems() {
+        return items;
+    }
 
-    public Character(String id, String name, String race, String religion, String serviceAddress) {
+    public List<String> getSpells() {
+        return spells;
+    }
+
+    public List<String> getStats() {
+        return stats;
+    }
+
+    public Character(
+            String id,
+            String name,
+            String race,
+            String religion,
+            String serviceAddress,
+            List<String> items,
+            List<String> spells,
+            List<String> stats
+    ) {
         this.id = id;
         this.name = name;
         this.race = race;
         this.religion = religion;
         this.serviceAddress = serviceAddress;
+        this.items = items;
+        this.spells = spells;
+        this.stats = stats;
     }
+
+
 
     public Character() {
         this.id = null;
@@ -43,5 +73,8 @@ public class Character {
         this.race = null;
         this.religion = null;
         this.serviceAddress = null;
+        this.spells = null;
+        this.items = null;
+        this.stats = null;
     }
 }

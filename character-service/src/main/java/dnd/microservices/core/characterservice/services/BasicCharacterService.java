@@ -6,6 +6,8 @@ import dnd.microservices.core.utils.http.ServiceUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+
 @RestController
 public class BasicCharacterService implements CharacterService {
 
@@ -20,6 +22,15 @@ public class BasicCharacterService implements CharacterService {
     //TODO: picture of the character
     @Override
     public Character getCharacter(String characterName) {
-        return new Character(characterName, characterName, "Aaraorca", "none", serviceUtil.getServiceAddress());
+        return new Character(
+                characterName,
+                characterName,
+                "Aaraorca",
+                "none",
+                serviceUtil.getServiceAddress(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>()
+        );
     }
 }
