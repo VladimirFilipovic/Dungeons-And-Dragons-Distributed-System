@@ -1,6 +1,10 @@
 package dnd.microservices.core.api.stats;
 
 public class Statistic {
+    private final String id;
+    private final String name;
+    private final int value;
+    private final String serviceAddress;
 
     public String getServiceAddress() {
         return serviceAddress;
@@ -17,11 +21,6 @@ public class Statistic {
     public int getValue() {
         return value;
     }
-
-    private final String id;
-    private final String name;
-    private final int value;
-    private final String serviceAddress;
 
 
     public Statistic(String id, String name, int value, String serviceAddress) {
