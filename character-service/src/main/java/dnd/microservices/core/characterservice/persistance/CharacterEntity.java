@@ -20,6 +20,42 @@ public class CharacterEntity {
     private List<String> spells;
     private List<String> stats;
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setRace(String race) {
+        this.race = race;
+    }
+
+    public void setReligion(String religion) {
+        this.religion = religion;
+    }
+
+    public void setServiceAddress(String serviceAddress) {
+        this.serviceAddress = serviceAddress;
+    }
+
+    public void setItems(List<String> items) {
+        this.items = items;
+    }
+
+    public void setSpells(List<String> spells) {
+        this.spells = spells;
+    }
+
+    public void setStats(List<String> stats) {
+        this.stats = stats;
+    }
+
     public String getId() {
         return id;
     }

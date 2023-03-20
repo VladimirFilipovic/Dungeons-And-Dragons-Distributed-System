@@ -8,10 +8,33 @@ public class ItemEntity {
 
     @Id @GeneratedValue
     private String id;
+    
+    @Version
+    private int version;
+
+ 
+
     private String name;
     private int amount;
     private String description;
     private String serviceAddress;
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
 
     public String getId() {
         return id;
@@ -33,12 +56,21 @@ public class ItemEntity {
         return serviceAddress;
     }
 
-    public ItemEntity(String id, String name, int amount, String description, String serviceAddress) {
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public ItemEntity(String id, String name, int amount, String description, String serviceAddress, int Version) {
         this.id = id;
         this.name = name;
         this.amount = amount;
         this.description = description;
         this.serviceAddress = serviceAddress;
+        this.version = Version;
     }
 
 

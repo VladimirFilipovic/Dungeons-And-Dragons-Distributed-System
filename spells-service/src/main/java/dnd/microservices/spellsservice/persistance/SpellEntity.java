@@ -1,6 +1,8 @@
 package dnd.microservices.spellsservice.persistance;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import java.util.Map;
@@ -8,7 +10,9 @@ import java.util.Map;
 @Entity
 @Table(name = "spells", indexes = { @Index(name = "spell-name-index", unique = true, columnList = "name") })
 public class SpellEntity {
-    private long id;
+    
+    @Id @GeneratedValue
+    private String id;
     private String name;
     private String description;
     private int range;
@@ -22,7 +26,7 @@ public class SpellEntity {
     }
 
     public SpellEntity(
-            long id,
+            String id,
             String name,
             String description,
             int range,
