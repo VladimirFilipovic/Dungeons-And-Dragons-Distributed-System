@@ -7,19 +7,17 @@ import javax.persistence.*;
 public class ItemEntity {
 
     @Id @GeneratedValue
-    private String id;
+    private int id;
     
     @Version
     private int version;
-
- 
 
     private String name;
     private int amount;
     private String description;
     private String serviceAddress;
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -36,7 +34,7 @@ public class ItemEntity {
     }
 
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
@@ -60,17 +58,15 @@ public class ItemEntity {
         return version;
     }
 
-    public void setVersion(int version) {
-        this.version = version;
+    public ItemEntity() {
     }
 
-    public ItemEntity(String id, String name, int amount, String description, String serviceAddress, int Version) {
+    public ItemEntity(int id, String name, int amount, String description, String serviceAddress) {
         this.id = id;
         this.name = name;
         this.amount = amount;
         this.description = description;
         this.serviceAddress = serviceAddress;
-        this.version = Version;
     }
 
 

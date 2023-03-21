@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import dnd.microservices.inventoryservice.persistance.ItemEntity;
 import dnd.microservices.inventoryservice.persistance.ItemRepository;
 
-import java.util.List;
+import java.io.Console;
+import java.util.Optional;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.*;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
@@ -27,29 +28,27 @@ public class PersistenceTests {
 
     @Autowired
     private ItemRepository repository;
-
     private ItemEntity savedEntity;
 
     @Before
    	public void setupDb() {
    		repository.deleteAll();
 
-        ItemEntity entity = new ItemEntity("1", "item 1", 3, "random", "?", 1);
+        ItemEntity entity = new ItemEntity( 1, "item 1", 3, "random", "?");
         savedEntity = repository.save(entity);
-
-        assertEqualsItem(entity, savedEntity);
     }
 
 
     @Test
    	public void create() {
+        int newEntityId = 1;
+        ItemEntity newEntity = new ItemEntity(newEntityId, "item 2", 3, "random 0", "?");
+        
+        ItemEntity newSavedEntity = repository.save(newEntity);
 
-        ItemEntity newEntity = new ItemEntity("2", "item 2", 3, "random", "?", 1);
-        repository.save(newEntity);
+        Optional<ItemEntity> foundEntity = repository.findById(newSavedEntity.getId());
 
-        ItemEntity foundEntity = repository.findById(newEntity.getId()).get();
-        assertEqualsItem(newEntity, foundEntity);
-
+        assertEqualsItem(newSavedEntity, foundEntity.get());
         assertEquals(2, repository.count());
     }
 
@@ -63,57 +62,56 @@ public class PersistenceTests {
         assertEquals(savedEntity.getDescription(), foundEntity.getDescription());
     }
 
-    // @Test
-   	// public void delete() {
-    //     repository.delete(savedEntity);
-    //     assertFalse(repository.existsById(savedEntity.getId()));
-    // }
+     @Test
+   	 public void delete() {
+         repository.delete(savedEntity);
+         assertFalse(repository.existsById(savedEntity.getId()));
+     }
 
-    // @Test
-   	// public void getByProductId() {
-    //     List<ItemEntity> entityList = repository.findByProductId(savedEntity.getProductId());
+     @Test
+   	 public void getByProductId() {
+         Optional<ItemEntity> entity = repository.findById(savedEntity.getId());
+         assertTrue(entity.isPresent());
+         assertEqualsItem(savedEntity, entity.get());
+     }
 
-    //     assertThat(entityList, hasSize(1));
-    //     assertEqualsItem(savedEntity, entityList.get(0));
-    // }
+     @Test(expected = DataIntegrityViolationException.class)
+     public void duplicateError() {
+        ItemEntity entity = new ItemEntity(1, "item 1", 3, "random", "?");
+        repository.save(entity);
+    }
 
-    // @Test(expected = DataIntegrityViolationException.class)
-   	// public void duplicateError() {
-    //     ItemEntity entity = new ItemEntity(1, 2, "a", "s", "c");
-    //     repository.save(entity);
-    // }
+    @Test
+   	public void optimisticLockError() {
 
-    // @Test
-   	// public void optimisticLockError() {
+        // Store the saved entity in two separate entity objects
+        ItemEntity entity1 = repository.findById(savedEntity.getId()).get();
+        ItemEntity entity2 = repository.findById(savedEntity.getId()).get();
 
-    //     // Store the saved entity in two separate entity objects
-    //     ItemEntity entity1 = repository.findById(savedEntity.getId()).get();
-    //     ItemEntity entity2 = repository.findById(savedEntity.getId()).get();
+        // Update the entity using the first entity object
+        entity1.setAmount(1000);
+        repository.save(entity1);
 
-    //     // Update the entity using the first entity object
-    //     entity1.setAuthor("a1");
-    //     repository.save(entity1);
+        //  Update the entity using the second entity object.
+        // This should fail since the second entity now holds a old version number, i.e. a Optimistic Lock Error
+        try {
+            entity2.setAmount(1000);
+            repository.save(entity2);
 
-    //     //  Update the entity using the second entity object.
-    //     // This should fail since the second entity now holds a old version number, i.e. a Optimistic Lock Error
-    //     try {
-    //         entity2.setAuthor("a2");
-    //         repository.save(entity2);
+            fail("Expected an OptimisticLockingFailureException");
+        } catch (OptimisticLockingFailureException e) {}
 
-    //         fail("Expected an OptimisticLockingFailureException");
-    //     } catch (OptimisticLockingFailureException e) {}
-
-    //     // Get the updated entity from the database and verify its new sate
-    //     ItemEntity updatedEntity = repository.findById(savedEntity.getId()).get();
-    //     assertEquals(1, (int)updatedEntity.getVersion());
-    //     assertEquals("a1", updatedEntity.getAuthor());
-    // }
+        // Get the updated entity from the database and verify its new sate
+        ItemEntity updatedEntity = repository.findById(savedEntity.getId()).get();
+        assertEquals(1, (int)updatedEntity.getVersion());
+        assertEquals(1000, updatedEntity.getAmount());
+    }
 
     private void assertEqualsItem(ItemEntity expectedEntity, ItemEntity actualEntity) {
         assertEquals(expectedEntity.getId(), actualEntity.getId());
-        assertEquals(expectedEntity.getVersion(), actualEntity.getVersion());
         assertEquals(expectedEntity.getName(), actualEntity.getName());
-        assertEquals(expectedEntity.getDescription(), actualEntity.getDescription());
         assertEquals(expectedEntity.getAmount(), actualEntity.getAmount());
+        assertEquals(expectedEntity.getDescription(), actualEntity.getDescription());
+        assertEquals(expectedEntity.getVersion(), actualEntity.getVersion());
     }
 }

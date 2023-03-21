@@ -9,5 +9,5 @@ public interface ItemRepository extends CrudRepository<ItemEntity, Integer> {
     @Transactional(readOnly = true)
     Optional<ItemEntity> findByName(String name);
     @Transactional(readOnly = true)
-    Optional<ItemEntity> findById(String id);
+    Optional<ItemEntity> findById(int id);
 }
