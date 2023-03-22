@@ -28,6 +28,7 @@ public class PersistenceTests {
 
     @Autowired
     private ItemRepository repository;
+    
     private ItemEntity savedEntity;
 
     @Before

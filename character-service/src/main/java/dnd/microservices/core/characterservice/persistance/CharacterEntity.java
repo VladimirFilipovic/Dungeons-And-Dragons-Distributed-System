@@ -1,18 +1,24 @@
 package dnd.microservices.core.characterservice.persistance;
 
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
 
 @Document(collection="characters")
 public class CharacterEntity {
-    @Id
+    @Id 
     private String id;
+    
     @Version
-    private Integer version;
+    private int version;
+    
+    @Indexed(unique = true)
     private String name;
+
     private String race;
     private String religion;
     private String serviceAddress;
@@ -23,11 +29,6 @@ public class CharacterEntity {
     public void setId(String id) {
         this.id = id;
     }
-
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -60,7 +61,7 @@ public class CharacterEntity {
         return id;
     }
 
-    public Integer getVersion() {
+    public int getVersion() {
         return version;
     }
 
@@ -83,9 +84,7 @@ public class CharacterEntity {
     public CharacterEntity() {
     }
 
-    public CharacterEntity(String id, Integer version, String name, String race, String religion, String serviceAddress) {
-        this.id = id;
-        this.version = version;
+    public CharacterEntity(String name, String race, String religion, String serviceAddress) {
         this.name = name;
         this.race = race;
         this.religion = religion;
