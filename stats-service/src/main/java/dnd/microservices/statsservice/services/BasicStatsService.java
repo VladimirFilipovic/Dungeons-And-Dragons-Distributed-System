@@ -37,14 +37,11 @@ public class BasicStatsService implements StatsService {
        return new ArrayList<>();
     }
 
-
-    /**
-     * @param characterName
-     * @param statisticName
-     * @param newValue
-     */
     @Override
-    public void changeCharacterStats(String characterName, String statisticName, Integer newValue) {
-
+    public void assignStatsToCharacter(String characterName, List<Statistic> stats) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'assignStatsToCharacter'");
     }
+
+
 }

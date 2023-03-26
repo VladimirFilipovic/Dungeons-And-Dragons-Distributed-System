@@ -49,21 +49,17 @@ public class BasicSpellsService implements SpellsService {
         );
     }
 
-    /**
-     * @param spellName
-     * @param characterName
-     */
     @Override
     public void assignSpellToCharacter(String spellName, String characterName) {
-        //TODO
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'assignSpellToCharacter'");
     }
 
-    /**
-     * @param spellName
-     * @param characterName
-     */
     @Override
-    public void unAssignSpellFromCharacter(String spellName, String characterName) {
-        //TODO
+    public void unAssignSpellFromCharacter(String characterName, String spellName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'unAssignSpellFromCharacter'");
     }
+
+   
 }

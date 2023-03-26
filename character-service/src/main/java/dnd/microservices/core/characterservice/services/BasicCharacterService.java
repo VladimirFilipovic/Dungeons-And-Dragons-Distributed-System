@@ -2,9 +2,14 @@ package dnd.microservices.core.characterservice.services;
 
 import dnd.microservices.core.api.character.Character;
 import dnd.microservices.core.api.character.CharacterService;
+import dnd.microservices.core.characterservice.persistance.CharacterEntity;
+import dnd.microservices.core.characterservice.persistance.CharacterRepository;
+import dnd.microservices.core.utils.exceptions.NotFoundException;
 import dnd.microservices.core.utils.http.ServiceUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.mongodb.DuplicateKeyException;
 
 import java.util.ArrayList;
 
@@ -12,25 +17,42 @@ import java.util.ArrayList;
 public class BasicCharacterService implements CharacterService {
 
     private final ServiceUtil serviceUtil;
+    private final CharacterRepository characterRepository;
+    private final CharacterMapper characterMapper;
 
     @Autowired
-    public BasicCharacterService(ServiceUtil serviceUtil) {
+    public BasicCharacterService(ServiceUtil serviceUtil, CharacterRepository characterRepository,
+            CharacterMapper characterMapper) {
         this.serviceUtil = serviceUtil;
+        this.characterRepository = characterRepository;
+        this.characterMapper = characterMapper;
     }
 
     //TODO: consider changing id from string to int https://stackoverflow.com/questions/3298814/how-does-performance-of-guids-compare-to-strings-in-sql
     //TODO: picture of the character
     @Override
     public Character getCharacter(String characterName) {
-        return new Character(
-                characterName,
-                characterName,
-                "Aaraorca",
-                "none",
-                serviceUtil.getServiceAddress(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>()
-        );
+        CharacterEntity characterEntity = characterRepository.findByName(characterName)
+                .orElseThrow(() -> new NotFoundException("No character found for name: " + characterName));
+        Character character = characterMapper.entityToApi(characterEntity);
+        character.setServiceAddress(serviceUtil.getServiceAddress());
+        return character;
+    }
+
+    @Override
+    public Character createCharacter(Character body) {
+      try {
+        CharacterEntity characterEntity = characterMapper.apiToEntity(body);
+        CharacterEntity newCharacterEntity = characterRepository.save(characterEntity);
+        return characterMapper.entityToApi(newCharacterEntity);
+      } catch (DuplicateKeyException dke) {
+        throw new IllegalArgumentException("Duplicate key, Character Name: " + body.getName());
+      }
+    }
+
+    @Override
+    public void deleteCharacter(String characterId) {
+      characterRepository.findById(characterId)
+      .ifPresent(e -> characterRepository.delete(e));
     }
 }
