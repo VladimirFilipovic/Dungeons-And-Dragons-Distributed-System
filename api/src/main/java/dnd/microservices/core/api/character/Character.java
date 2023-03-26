@@ -8,10 +8,11 @@ public class Character {
     private final String name;
     private final String race;
     private final String religion;
-    private final String serviceAddress;
     private final List<String> items;
     private final List<String> spells;
     private final List<String> stats;
+
+    private String serviceAddress;
 
 
     public String getId() {
@@ -43,6 +44,10 @@ public class Character {
 
     public List<String> getStats() {
         return stats;
+    }
+
+    public void setServiceAddress(String serviceAddress) {
+        this.serviceAddress = serviceAddress;
     }
 
     public Character(

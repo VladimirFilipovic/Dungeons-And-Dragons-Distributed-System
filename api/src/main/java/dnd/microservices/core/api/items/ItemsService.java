@@ -1,7 +1,9 @@
 package dnd.microservices.core.api.items;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -10,7 +12,7 @@ import java.util.List;
 public interface ItemsService {
 
     /**
-     * Sample usage: curl $HOST:$PORT/items?characterName="Milorad"
+     * Sample usage: curl $HOST:$PORT/items?characterName="Miroljub"
      *
      * @param characterName
      * @return
@@ -26,6 +28,14 @@ public interface ItemsService {
     )
     Item getItem(@PathVariable String itemName);
 
-    void addItemToInventory(String itemName, String inventoryId);
-    void removeItemFromInventory(String itemName, String inventoryId);
+    @PostMapping(
+            value = "/items",
+            consumes = "application/json",
+            produces = "application/json"
+    )
+    void addItemToInventory(CharacterInventoryItemDto body);
+
+    @DeleteMapping(value = "/items")
+    void removeItemFromInventory(@RequestParam(value = "characterId", required = true) String characterId,
+                    @RequestParam(value = "itemId", required = true) String itemId);
 }
