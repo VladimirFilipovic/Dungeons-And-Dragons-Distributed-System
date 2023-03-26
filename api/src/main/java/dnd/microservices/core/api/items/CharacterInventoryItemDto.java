@@ -1,14 +1,14 @@
 package dnd.microservices.core.api.items;
 
 public class CharacterInventoryItemDto {
-   public String CharacterId;
-   public String ItemId;
+   public String characterName;
+   public String itemName;
 
     public CharacterInventoryItemDto() {
     }
 
-    public CharacterInventoryItemDto(String characterId, String itemId) {
-        CharacterId = characterId;
-        ItemId = itemId;
+    public CharacterInventoryItemDto(String characterName, String itemName) {
+        this.characterName = characterName;
+        this.itemName = itemName;
     }
 }

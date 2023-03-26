@@ -3,15 +3,19 @@ package dnd.microservices.inventoryservice.services;
 import dnd.microservices.core.api.items.CharacterInventoryItemDto;
 import dnd.microservices.core.api.items.Item;
 import dnd.microservices.core.api.items.ItemsService;
+import dnd.microservices.core.utils.exceptions.NotFoundException;
 import dnd.microservices.core.utils.http.ServiceUtil;
+import dnd.microservices.inventoryservice.persistance.ItemEntity;
 import dnd.microservices.inventoryservice.persistance.ItemRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @RestController
 public class BasicInventoryService implements ItemsService {
@@ -33,16 +37,14 @@ public class BasicInventoryService implements ItemsService {
      */
     @Override
     public List<Item> getItems(String characterName) {
-        List<ItemEntity> itemEntities = null;
-        if (characterName != null) {
-            itemEntities = itemRepository.fi(characterName);
-        }
-        List<Item> items = new ArrayList<>();
-        for (ItemEntity itemEntity : itemEntities) {
-            Item item = itemMapper.entityToApi(itemEntity);
-            item.setServiceAddress(serviceUtil.getServiceAddress());
-            items.add(item);
-        }
+        Stream<ItemEntity> itemEntitiesStream = StreamSupport.stream(itemRepository.findAll().spliterator(), false);
+
+        List<Item> items = itemEntitiesStream
+                .filter(itemEntity -> characterName == null || itemEntity.getCharacterNames().contains(characterName))
+                .map(itemMapper::entityToApi)
+                .peek(item -> item.setServiceAddress(serviceUtil.getServiceAddress()))
+                .collect(Collectors.toList());
+    
         return items;
     }
 
@@ -52,24 +54,30 @@ public class BasicInventoryService implements ItemsService {
      */
     @Override
     public Item getItem(String itemName) {
-        return new Item(itemName, itemName, 100, "Fake item dude", this.serviceUtil.getServiceAddress());
+        ItemEntity itemEntity = itemRepository.findByName(itemName)
+                .orElseThrow(() -> new NotFoundException("No item found for name: " + itemName));
+        Item item = itemMapper.entityToApi(itemEntity);
+        item.setServiceAddress(serviceUtil.getServiceAddress());
+        return item;
     }
 
-    /**
-     * @param itemName
-     * @param inventoryId
-     */
-    @Override
-    public void removeItemFromInventory(String itemName, String inventoryId) {
-
-    }
-
-    /**
-     * @param body
-     */
     @Override
     public void addItemToInventory(CharacterInventoryItemDto body) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addItemToInventory'");
+            itemRepository.findByName(body.itemName).ifPresent(itemEntity -> {
+                itemEntity.getCharacterNames().add(body.characterName);
+                itemRepository.save(itemEntity);
+              });
     }
+
+    @Override
+    public void removeItemFromInventory(String characterName, String itemName) {
+      itemRepository.findByName(itemName).ifPresent(itemEntity -> {
+        itemEntity.getCharacterNames().remove(characterName);
+        itemRepository.save(itemEntity);
+      });
+    }
+
+  
+
+
 }

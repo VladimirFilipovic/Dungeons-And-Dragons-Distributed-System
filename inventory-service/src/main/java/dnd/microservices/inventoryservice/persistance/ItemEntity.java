@@ -1,5 +1,10 @@
 package dnd.microservices.inventoryservice.persistance;
 
+
+
+import java.util.ArrayList;
+import java.util.Set;
+
 import javax.persistence.*;
 
 @Entity
@@ -7,64 +12,23 @@ import javax.persistence.*;
 public class ItemEntity {
 
     @Id @GeneratedValue
-    private int id;
+    public int id;
     
     @Version
-    private int version;
+    public int version;
 
-    private String name;
-    private int amount;
-    private String description;
-    private String serviceAddress;
+    public String name;
+    public String description;
+    public String serviceAddress;
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setAmount(int amount) {
-        this.amount = amount;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getAmount() {
-        return amount;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getServiceAddress() {
-        return serviceAddress;
-    }
-
-    public int getVersion() {
-        return version;
-    }
-
+    @ManyToMany(mappedBy = "item")
+    public Set<CharacterInventoryItemEntity> characterInventoryItem;
+    
     public ItemEntity() {
     }
 
-    public ItemEntity(int id, String name, int amount, String description, String serviceAddress) {
-        this.id = id;
+    public ItemEntity(String name, String description, Set<CharacterInventoryItemEntity> characterInventoryItem, String serviceAddress) {
         this.name = name;
-        this.amount = amount;
         this.description = description;
         this.serviceAddress = serviceAddress;
     }

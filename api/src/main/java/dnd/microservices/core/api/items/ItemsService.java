@@ -36,6 +36,6 @@ public interface ItemsService {
     void addItemToInventory(CharacterInventoryItemDto body);
 
     @DeleteMapping(value = "/items")
-    void removeItemFromInventory(@RequestParam(value = "characterId", required = true) String characterId,
-                    @RequestParam(value = "itemId", required = true) String itemId);
+    void removeItemFromInventory(@RequestParam(value = "characterName", required = true) String characterName,
+                    @RequestParam(value = "itemName", required = true) String itemName);
 }

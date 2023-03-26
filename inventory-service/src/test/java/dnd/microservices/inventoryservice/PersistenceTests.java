@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -35,7 +36,7 @@ public class PersistenceTests {
    	public void setupDb() {
    		repository.deleteAll();
 
-        ItemEntity entity = new ItemEntity( 1, "item 1", 3, "random", "?");
+        ItemEntity entity = new ItemEntity( 1, "item 1", 3, "random", null, "?");
         savedEntity = repository.save(entity);
     }
 
@@ -43,7 +44,7 @@ public class PersistenceTests {
     @Test
    	public void create() {
         int newEntityId = 1;
-        ItemEntity newEntity = new ItemEntity(newEntityId, "item 2", 3, "random 0", "?");
+        ItemEntity newEntity = new ItemEntity(newEntityId, "item 2", 3, "random 0", null, "?");
         
         ItemEntity newSavedEntity = repository.save(newEntity);
 
@@ -78,7 +79,7 @@ public class PersistenceTests {
 
      @Test(expected = DataIntegrityViolationException.class)
      public void duplicateError() {
-        ItemEntity entity = new ItemEntity(1, "item 1", 3, "random", "?");
+        ItemEntity entity = new ItemEntity(1, "item 1", 3, "random" , null, "?");
         repository.save(entity);
     }
 

@@ -5,7 +5,8 @@ public class Item {
     private final String name;
     private final int amount;
     private final String description;
-    private final String serviceAdress;
+    
+    private  String serviceAddress;
 
     public String getId() {
         return id;
@@ -23,16 +24,20 @@ public class Item {
         return description;
     }
 
-    public String getServiceAdress() {
-        return serviceAdress;
+    public String getServiceAddress() {
+        return serviceAddress;
     }
 
-    public Item(String id, String name, int amount, String description, String serviceAdress) {
+    public void setServiceAddress(String serviceAddress) {
+        this.serviceAddress = serviceAddress;
+    }
+
+    public Item(String id, String name, int amount, String description, String serviceAddress) {
         this.id = id;
         this.name = name;
         this.amount = amount;
         this.description = description;
-        this.serviceAdress = serviceAdress;
+        this.serviceAddress = serviceAddress;
     }
 
     public Item() {
@@ -40,6 +45,6 @@ public class Item {
         this.name = null;
         this.amount = 0;
         this.description = null;
-        this.serviceAdress = null;
+        this.serviceAddress = null;
     }
 }
