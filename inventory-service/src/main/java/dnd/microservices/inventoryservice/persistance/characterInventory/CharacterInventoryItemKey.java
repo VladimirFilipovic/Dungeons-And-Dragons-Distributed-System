@@ -1,4 +1,4 @@
-package dnd.microservices.inventoryservice.persistance;
+package dnd.microservices.inventoryservice.persistance.characterInventory;
 
 import java.io.Serializable;
 

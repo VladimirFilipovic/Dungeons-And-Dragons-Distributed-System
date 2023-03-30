@@ -1,9 +1,12 @@
-package dnd.microservices.inventoryservice.persistance;
+package dnd.microservices.inventoryservice.persistance.characterInventory;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
+
+import dnd.microservices.inventoryservice.persistance.inventory.CharacterInventoryEntity;
+import dnd.microservices.inventoryservice.persistance.item.ItemEntity;
 
 public class CharacterInventoryItemEntity {
     

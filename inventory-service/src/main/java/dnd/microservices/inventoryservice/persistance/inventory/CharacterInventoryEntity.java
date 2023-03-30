@@ -1,8 +1,11 @@
-package dnd.microservices.inventoryservice.persistance;
+package dnd.microservices.inventoryservice.persistance.inventory;
 
 import java.util.Set;
 
 import javax.persistence.*;
+
+import dnd.microservices.inventoryservice.persistance.characterInventory.*;
+
 
 @Entity
 @Table(name = "character_inventory")
