@@ -4,9 +4,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
-import dnd.microservices.core.api.items.CharacterInventoryItemDto;
+import dnd.microservices.core.api.items.InventoryItem;
 import dnd.microservices.core.api.items.Item;
-import dnd.microservices.inventoryservice.persistance.ItemEntity;
+import dnd.microservices.inventoryservice.persistance.item.ItemEntity;
 
 @Mapper(componentModel = "spring")
 public interface ItemMapper {
@@ -20,5 +20,5 @@ public interface ItemMapper {
         @Mapping(target = "id", ignore = true),
         @Mapping(target = "version", ignore = true)
     })
-    ItemEntity apiToEntity(CharacterInventoryItemDto body);
+    ItemEntity apiToEntity(InventoryItem body);
 }
