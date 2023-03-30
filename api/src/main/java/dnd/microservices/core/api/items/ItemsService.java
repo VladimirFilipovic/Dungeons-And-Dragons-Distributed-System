@@ -11,31 +11,15 @@ import java.util.List;
 
 public interface ItemsService {
 
-    /**
-     * Sample usage: curl $HOST:$PORT/items?characterName="Miroljub"
-     *
-     * @param characterName
-     * @return
-     */
     @GetMapping(
             value    = "/items",
             produces = "application/json")
-    List<Item> getItems(@RequestParam(value = "characterName", required = false) String characterName);
+    List<Item> getItems();
 
     @GetMapping(
             value = "/items/{itemName}",
             produces = "application/json"
     )
     Item getItem(@PathVariable String itemName);
-
-    @PostMapping(
-            value = "/items",
-            consumes = "application/json",
-            produces = "application/json"
-    )
-    void addItemToInventory(CharacterInventoryItemDto body);
-
-    @DeleteMapping(value = "/items")
-    void removeItemFromInventory(@RequestParam(value = "characterName", required = true) String characterName,
-                    @RequestParam(value = "itemName", required = true) String itemName);
+ 
 }
