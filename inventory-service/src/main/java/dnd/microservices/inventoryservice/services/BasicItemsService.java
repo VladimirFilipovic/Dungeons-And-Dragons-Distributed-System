@@ -1,8 +1,8 @@
 package dnd.microservices.inventoryservice.services;
 
-import dnd.microservices.core.api.items.InventoryItem;
 import dnd.microservices.core.api.items.Item;
 import dnd.microservices.core.api.items.ItemsService;
+import dnd.microservices.core.api.items.inventory.InventoryItem;
 import dnd.microservices.core.utils.exceptions.NotFoundException;
 import dnd.microservices.core.utils.http.ServiceUtil;
 import dnd.microservices.inventoryservice.persistance.item.ItemEntity;

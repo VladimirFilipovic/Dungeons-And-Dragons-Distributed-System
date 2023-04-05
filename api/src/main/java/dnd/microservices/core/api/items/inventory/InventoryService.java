@@ -1,4 +1,4 @@
-package dnd.microservices.core.api.items;
+package dnd.microservices.core.api.items.inventory;
 
 import java.util.List;
 
@@ -19,5 +19,5 @@ public interface InventoryService {
         consumes = "application/json",
         produces = "application/json"
     )
-    void modifyCharacterInventory(@PathVariable String characterName, InventoryItem body);
+    void modifyCharacterInventory(@PathVariable String characterName, InventoryItemModificationDto body);
 }

@@ -13,8 +13,8 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import dnd.microservices.inventoryservice.persistance.ItemEntity;
-import dnd.microservices.inventoryservice.persistance.ItemRepository;
+import dnd.microservices.inventoryservice.persistance.item.ItemEntity;
+import dnd.microservices.inventoryservice.persistance.item.ItemRepository;
 
 import java.io.Console;
 import java.util.Optional;
@@ -26,6 +26,8 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 @DataJpaTest
 @Transactional(propagation = NOT_SUPPORTED)
 public class PersistenceTests {
+
+    
 
     @Autowired
     private ItemRepository repository;

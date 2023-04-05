@@ -3,7 +3,6 @@ package dnd.microservices.core.api.items;
 public class Item {
     private final String id;
     private final String name;
-    private final int amount;
     private final String description;
     
     private  String serviceAddress;
@@ -14,10 +13,6 @@ public class Item {
 
     public String getName() {
         return name;
-    }
-
-    public int getAmount() {
-        return amount;
     }
 
     public String getDescription() {
@@ -32,10 +27,9 @@ public class Item {
         this.serviceAddress = serviceAddress;
     }
 
-    public Item(String id, String name, int amount, String description, String serviceAddress) {
+    public Item(String id, String name, String description, String serviceAddress) {
         this.id = id;
         this.name = name;
-        this.amount = amount;
         this.description = description;
         this.serviceAddress = serviceAddress;
     }
@@ -43,7 +37,6 @@ public class Item {
     public Item() {
         this.id = null;
         this.name = null;
-        this.amount = 0;
         this.description = null;
         this.serviceAddress = null;
     }

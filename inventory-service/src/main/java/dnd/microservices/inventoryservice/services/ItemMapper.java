@@ -4,8 +4,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
-import dnd.microservices.core.api.items.InventoryItem;
 import dnd.microservices.core.api.items.Item;
+import dnd.microservices.core.api.items.inventory.InventoryItem;
 import dnd.microservices.inventoryservice.persistance.item.ItemEntity;
 
 @Mapper(componentModel = "spring")

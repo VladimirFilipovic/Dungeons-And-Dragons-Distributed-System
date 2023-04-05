@@ -1,4 +1,4 @@
-package dnd.microservices.core.api.items;
+package dnd.microservices.core.api.items.inventory;
 
 public enum ModificationType {
     ADD,
