@@ -1,45 +1,92 @@
 package dnd.microservices.inventoryservice.services;
 
 import java.util.List;
-import java.util.stream.StreamSupport;
 
-import dnd.microservices.core.api.items.inventorys.InventoryItem;
-import dnd.microservices.core.api.items.inventorys.InventoryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
 
+import dnd.microservices.core.api.items.inventory.InventoryItem;
+import dnd.microservices.core.api.items.inventory.InventoryItemModificationDto;
+import dnd.microservices.core.api.items.inventory.InventoryService;
+import dnd.microservices.core.api.items.inventory.ModificationType;
+import dnd.microservices.core.utils.exceptions.NotFoundException;
+import dnd.microservices.core.utils.http.ServiceUtil;
+import dnd.microservices.inventoryservice.persistance.characterInventory.CharacterInventoryItemEntity;
+import dnd.microservices.inventoryservice.persistance.characterInventory.CharacterInventoryItemEntityRepository;
+import dnd.microservices.inventoryservice.persistance.characterInventory.CharacterInventoryItemKey;
+import dnd.microservices.inventoryservice.persistance.inventory.CharacterInventoryEntity;
+import dnd.microservices.inventoryservice.persistance.inventory.CharacterInventoryRepository;
+import dnd.microservices.inventoryservice.persistance.item.ItemEntity;
+import dnd.microservices.inventoryservice.persistance.item.ItemRepository;
+
+@RestController
 public class BasicInventoryService implements InventoryService {
 
-    // private 
+    private final CharacterInventoryRepository characterInventoryRepository;
+    private final CharacterInventoryItemEntityRepository characterInventoryItemEntityRepository;
+    private final ItemRepository itemRepository;
+    private final InventoryMapper inventoryMapper;
+    private final ServiceUtil serviceUtil;
+
+    @Autowired
+    public BasicInventoryService(
+            CharacterInventoryRepository characterInventoryRepository,
+            CharacterInventoryItemEntityRepository characterInventoryItemEntityRepository,
+            ItemRepository itemRepository,
+            InventoryMapper inventoryMapper, 
+            ServiceUtil serviceUtil
+        ) {
+        this.characterInventoryRepository = characterInventoryRepository;
+        this.characterInventoryItemEntityRepository = characterInventoryItemEntityRepository;
+        this.itemRepository = itemRepository;
+        this.inventoryMapper = inventoryMapper;
+        this.serviceUtil = serviceUtil;
+    }
 
     @Override
-    public List<InventoryItem> getCharacterInventory(String characterName) {
+    public List<InventoryItem> getCharacterInventory(String characterId) {
+        CharacterInventoryEntity inventoryEntity = characterInventoryRepository
+                .findByCharacterId(characterId)
+                .orElseThrow(() -> new NotFoundException("No inventory found for characterId: " + characterId));
         
-        Stream<InventoryItem> inventoryEntitiesStream = StreamSupport.stream(inventoryRepository.findAll().spliterator(), false);
-
-        List<Item> inventorys = inventoryEntitiesStream
-                .map(inventoryMapper::entityToApi)
-                .peek(inventory -> inventory.setServiceAddress(serviceUtil.getServiceAddress()))
-                .collect(Collectors.toList());
-    
-        return inventorys;
+        return inventoryMapper.entityToApi(inventoryEntity.items);
     }
 
     @Override
-    public void modifyCharacterInventory(String characterName, InventoryItem body) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'modifyCharacterInventory'");
-    }
-    // @Override
-    // public void addItemToInventory(InventoryItem body) {
-    //         inventoryRepository.findByName(body.inventoryName).ifPresent(inventoryEntity -> {
-    //             inventoryEntity.getCharacterNames().add(body.characterName);
-    //             inventoryRepository.save(inventoryEntity);
-    //           });
-    // }
+    public void modifyCharacterInventory(String characterId, InventoryItemModificationDto body) {
+        this.characterInventoryItemEntityRepository
+            .findById(new CharacterInventoryItemKey(characterId, body.itemId))
+            .ifPresentOrElse(
+                characterInventoryItemEntity -> {
+                    if (body.modificationType == ModificationType.ADD) {
+                        characterInventoryItemEntity.quantity += body.amount;
+                    } else {
+                        characterInventoryItemEntity.quantity -= body.amount;
+                    }
+                    this.characterInventoryItemEntityRepository.save(characterInventoryItemEntity);
+                },
+                () -> {
+                    if (body.modificationType == ModificationType.ADD) {
+                        CharacterInventoryEntity inventoryEntity = characterInventoryRepository
+                            .findByCharacterId(characterId)
+                            .orElseThrow(() -> new NotFoundException("No inventory found for characterId: " + characterId));
 
-    // @Override
-    // public void removeItemFromInventory(String characterName, String inventoryName) {
-    //   inventoryRepository.findByName(inventoryName).ifPresent(inventoryEntity -> {
-    //     inventoryEntity.getCharacterNames().remove(characterName);
-    //     inventoryRepository.save(inventoryEntity);
-    //   });
+                        ItemEntity itemEntity = itemRepository.findById(body.itemId)
+                            .orElseThrow(() -> new NotFoundException("No item found with itemId: " + body.itemId));
+
+                        CharacterInventoryItemEntity characterInventoryItemEntity = new CharacterInventoryItemEntity(
+                            inventoryEntity,
+                            itemEntity,
+                            body.amount
+                        );
+                         this.characterInventoryItemEntityRepository.save(characterInventoryItemEntity);
+                    }
+                    else {
+                        throw new NotFoundException("No item found with itemId: " + body.itemId + " for characterId: " + characterId);
+                    }
+                   
+                }
+            );
+    }
+
 }
