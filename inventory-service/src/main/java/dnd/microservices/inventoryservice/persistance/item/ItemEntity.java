@@ -1,8 +1,10 @@
 package dnd.microservices.inventoryservice.persistance.item;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.*;
+
 
 import dnd.microservices.inventoryservice.persistance.characterInventory.*;
 
@@ -20,18 +22,16 @@ public class ItemEntity {
     public String description;
     public String serviceAddress;
 
-    @ManyToMany(mappedBy = "item")
+    @OneToMany(mappedBy = "item")
     public Set<CharacterInventoryItemEntity> characterInventories;
     
     public ItemEntity() {
     }
 
-    public ItemEntity(String name, String description, Set<CharacterInventoryItemEntity> characterInventories,
-            String serviceAddress) {
+    public ItemEntity(String name, String description, String serviceAddress) {
         this.name = name;
         this.description = description;
         this.serviceAddress = serviceAddress;
-        this.characterInventories = characterInventories;
     }
 
 }

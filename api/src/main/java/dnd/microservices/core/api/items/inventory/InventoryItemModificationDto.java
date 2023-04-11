@@ -2,7 +2,7 @@ package dnd.microservices.core.api.items.inventory;
 
 public class InventoryItemModificationDto {
 
-    public String itemName;
+    public int itemId;
    
     public int amount;
 
@@ -11,8 +11,8 @@ public class InventoryItemModificationDto {
     public InventoryItemModificationDto() {
     }
 
-    public InventoryItemModificationDto(String itemName, int amount, ModificationType modificationType) {
-        this.itemName = itemName;
+    public InventoryItemModificationDto(int itemId, int amount, ModificationType modificationType) {
+        this.itemId = itemId;
         this.amount = amount;
         this.modificationType = modificationType;
     }

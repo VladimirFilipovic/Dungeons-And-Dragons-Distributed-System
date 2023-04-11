@@ -2,21 +2,20 @@ package dnd.microservices.inventoryservice.persistance.characterInventory;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import javax.persistence.*;
 
 @Embeddable
 public class CharacterInventoryItemKey implements Serializable {
     
     @Column(name = "character_inventory_id")
-    public int characterInventoryId;
+    public String characterInventoryId;
 
     @Column(name = "item_id")
     public int itemId;
 
     @Override
     public int hashCode() {
-        return characterInventoryId + itemId;
+        return characterInventoryId.hashCode() + itemId;
     }
 
     @Override
@@ -29,5 +28,14 @@ public class CharacterInventoryItemKey implements Serializable {
         }
         CharacterInventoryItemKey key = (CharacterInventoryItemKey) obj;
         return key.characterInventoryId == characterInventoryId && key.itemId == itemId;
+    }
+
+
+    public CharacterInventoryItemKey() {
+    }
+
+    public CharacterInventoryItemKey(String characterInventoryId, int itemId) {
+        this.characterInventoryId = characterInventoryId;
+        this.itemId = itemId;
     }
 }

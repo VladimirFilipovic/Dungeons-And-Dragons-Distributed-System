@@ -1,6 +1,8 @@
 package dnd.microservices.inventoryservice.persistance.inventory;
 
+import java.util.HashSet;
 import java.util.Set;
+
 
 import javax.persistence.*;
 
@@ -25,10 +27,8 @@ public class CharacterInventoryEntity {
     public CharacterInventoryEntity() {
     }
 
-    public CharacterInventoryEntity(String characterId, Set<CharacterInventoryItemEntity> items, String serviceAddress) {
+    public CharacterInventoryEntity(String characterId) {
         this.characterId = characterId;
-        this.items = items;
-        this.serviceAddress = serviceAddress;
     }
     
 }

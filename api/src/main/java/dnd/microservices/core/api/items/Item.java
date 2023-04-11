@@ -1,13 +1,14 @@
 package dnd.microservices.core.api.items;
 
 public class Item {
-    private final String id;
+    
+    private final int id;
     private final String name;
     private final String description;
     
     private  String serviceAddress;
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
@@ -27,7 +28,7 @@ public class Item {
         this.serviceAddress = serviceAddress;
     }
 
-    public Item(String id, String name, String description, String serviceAddress) {
+    public Item(int id, String name, String description, String serviceAddress) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -35,7 +36,7 @@ public class Item {
     }
 
     public Item() {
-        this.id = null;
+        this.id = 0;
         this.name = null;
         this.description = null;
         this.serviceAddress = null;

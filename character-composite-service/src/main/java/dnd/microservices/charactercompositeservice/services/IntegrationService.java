@@ -239,4 +239,32 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
             return ex.getMessage();
         }
     }
+
+
+    @Override
+    public void assignStatsToCharacter(String characterName, List<Statistic> stats) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'assignStatsToCharacter'");
+    }
+
+
+    @Override
+    public List<Item> getItems() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getItems'");
+    }
+
+
+    @Override
+    public Character createCharacter(Character body) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'createCharacter'");
+    }
+
+
+    @Override
+    public void deleteCharacter(String characterId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteCharacter'");
+    }
 }
