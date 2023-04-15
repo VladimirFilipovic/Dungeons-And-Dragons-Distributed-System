@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 public interface InventoryService {
     
     @GetMapping(
-            value    = "/character-inventory/{character-name}",
+            value    = "/characters/{character-name}/inventory",
             produces = "application/json"
         )
     List<InventoryItem> getCharacterInventory(@PathVariable String characterName);
    
     @PostMapping(
-        value = "/character-inventory/{character-name}", 
+        value = "/characters/{character-name}/inventory", 
         consumes = "application/json",
         produces = "application/json"
     )

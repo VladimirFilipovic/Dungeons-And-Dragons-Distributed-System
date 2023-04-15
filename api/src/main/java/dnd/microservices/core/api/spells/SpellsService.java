@@ -10,26 +10,8 @@ import java.util.List;
 
 public interface SpellsService {
     @GetMapping(
-            value = "/spells",
-            produces = "application/json"
-    )
-    List<Spell> getSpells(@RequestParam(value = "characterName", required = false) String characterName);
-
-    @GetMapping(
             value = "/spells/{spellName}",
             produces = "application/json"
     )
     Spell getSpell(@PathVariable String spellName);
-    
-    @PostMapping(
-            value = "/spells",
-            consumes = "application/json",
-            produces = "application/json"
-    )
-    void assignSpellToCharacter(String spellName, String characterName);
-
-    @DeleteMapping(value = "/spells")
-    void unAssignSpellFromCharacter(@RequestParam(value = "characterName", required = true) String characterName,
-                    @RequestParam(value = "spellName", required = true) String spellName);
-
 }

@@ -5,7 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @ComponentScan("dnd.microservices")
@@ -19,6 +21,11 @@ public class SpellsApplication {
 
 		String mysqlUri = ctx.getEnvironment().getProperty("spring.datasource.url");
 		LOG.info("Connected to MySQL: " + mysqlUri);
+	}
+
+	@Bean
+	RestTemplate restTemplate() {
+		return new RestTemplate();
 	}
 
 }

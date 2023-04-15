@@ -1,64 +1,44 @@
 package dnd.microservices.spellsservice.services;
 
+import dnd.microservices.core.api.dnd5e.DndSpell;
 import dnd.microservices.core.api.spells.Spell;
 import dnd.microservices.core.api.spells.SpellsService;
 import dnd.microservices.core.utils.http.ServiceUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 
 @RestController
 public class BasicSpellsService implements SpellsService {
 
     private final ServiceUtil serviceUtil;
+    private final RestTemplate restTemplate;
+    private final SpellMapper mapper;
+    private static final String API_BASE_URL = "https://www.dnd5eapi.co/api";
+
 
     @Autowired
-    public BasicSpellsService(ServiceUtil serviceUtil) {
+    public BasicSpellsService(ServiceUtil serviceUtil, RestTemplate restTemplate, SpellMapper mapper) {
         this.serviceUtil = serviceUtil;
+        this.mapper = mapper;
+        this.restTemplate = restTemplate;
     }
-
-    /**
-     * @param characterName
-     * @return
-     */
-    @Override
-    public List<Spell> getSpells(String characterName) {
-        return new ArrayList<>();
-    }
-
+    
     /**
      * @param spellName
      * @return
      */
     @Override
     public Spell getSpell(String spellName) {
-        return new Spell(
-                spellName,
-                spellName,
-                "Fake spell",
-                20,
-                "20",
-                "20",
-                15,
-                new HashMap<>(),
-                this.serviceUtil.getServiceAddress()
+        DndSpell dndSpell = this.restTemplate.getForObject(
+            API_BASE_URL + "/spells/" + spellName,
+            DndSpell.class
         );
-    }
 
-    @Override
-    public void assignSpellToCharacter(String spellName, String characterName) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'assignSpellToCharacter'");
-    }
-
-    @Override
-    public void unAssignSpellFromCharacter(String characterName, String spellName) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'unAssignSpellFromCharacter'");
+        return this.mapper.mapDndSpellToSpell(dndSpell);
     }
 
    

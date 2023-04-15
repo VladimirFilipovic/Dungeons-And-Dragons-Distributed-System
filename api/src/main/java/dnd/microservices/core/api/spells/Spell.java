@@ -33,7 +33,7 @@ public class Spell {
         return level;
     }
 
-    public Map<String, Integer> getDamageAtLevel() {
+    public Map<Integer, Integer> getDamageAtLevel() {
         return damageAtLevel;
     }
 
@@ -47,10 +47,10 @@ public class Spell {
     private final String duration;
     private final String castingTime;
     private final int level;
-    private final Map<String, Integer> damageAtLevel;
+    private final Map<Integer, Integer> damageAtLevel;
     private final String serviceAdress;
 
-    public Spell(String id, String name, String description, int range, String duration, String castingTime, int level, Map<String, Integer> damageAtLevel
+    public Spell(String id, String name, String description, int range, String duration, String castingTime, int level, Map<Integer, Integer> damageAtLevel
                  ,String serviceAdress) {
         this.id = id;
         this.name = name;
