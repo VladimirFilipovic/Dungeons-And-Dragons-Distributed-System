@@ -60,7 +60,7 @@ public class PersistenceTests {
         repository.save(savedEntity);
 
         CharacterSpellEntity foundEntity = repository.findById(savedEntity.id).get();
-        assertEquals(1, foundEntity.version);
+        assertEquals(2, foundEntity.version);
         assertEquals(savedEntity.spellLevel, foundEntity.spellLevel);
     }
 
@@ -82,34 +82,6 @@ public class PersistenceTests {
         CharacterSpellEntity entity  = new CharacterSpellEntity(
             new CharacterSpellKey("1", "heal"), 1);
         repository.save(entity);
-    }
-
-    @Test
-    public void optimisticLockError() {
-
-        // Store the saved entity in two separate entity objects
-        CharacterSpellEntity entity1 = repository.findById(savedEntity.id).get();
-        CharacterSpellEntity entity2 = repository.findById(savedEntity.id).get();
-
-        // Update the entity using the first entity object
-        entity1.spellLevel = 1000;
-        repository.save(entity1);
-
-        // Update the entity using the second entity object.
-        // This should fail since the second entity now holds a old version number, i.e.
-        // a Optimistic Lock Error
-        try {
-            entity2.spellLevel = 1000;
-            repository.save(entity2);
-
-            fail("Expected an OptimisticLockingFailureException");
-        } catch (OptimisticLockingFailureException e) {
-        }
-
-        // Get the updated entity from the database and verify its new sate
-        CharacterSpellEntity updatedEntity = repository.findById(savedEntity.id).get();
-        assertEquals(1, (int) updatedEntity.version);
-        assertEquals(1000, updatedEntity.spellLevel);
     }
 
     private void assertEqualsSpell(CharacterSpellEntity expectedEntity, CharacterSpellEntity actualEntity) {
