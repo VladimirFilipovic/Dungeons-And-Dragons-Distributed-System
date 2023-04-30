@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
 import dnd.microservices.core.api.items.Item;
+import dnd.microservices.core.api.items.ItemCreateDto;
 import dnd.microservices.core.api.items.inventory.InventoryItem;
 import dnd.microservices.inventoryservice.persistance.item.ItemEntity;
 
@@ -21,4 +22,9 @@ public interface ItemMapper {
         @Mapping(target = "version", ignore = true)
     })
     ItemEntity apiToEntity(InventoryItem body);
+
+    @Mappings({
+        @Mapping(target = "serviceAddress", ignore = true)
+    })
+    ItemEntity itemCreateDtoToItemEntity(ItemCreateDto itemCreateDto);
 }

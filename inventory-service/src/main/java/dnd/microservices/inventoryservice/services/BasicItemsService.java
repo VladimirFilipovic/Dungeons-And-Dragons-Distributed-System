@@ -1,6 +1,7 @@
 package dnd.microservices.inventoryservice.services;
 
 import dnd.microservices.core.api.items.Item;
+import dnd.microservices.core.api.items.ItemCreateDto;
 import dnd.microservices.core.api.items.ItemsService;
 import dnd.microservices.core.api.items.inventory.InventoryItem;
 import dnd.microservices.core.utils.exceptions.NotFoundException;
@@ -60,6 +61,16 @@ public class BasicItemsService implements ItemsService {
         item.setServiceAddress(serviceUtil.getServiceAddress());
         
         return item;
+    }
+
+    @Override
+    public void createItem(ItemCreateDto body) {
+        ItemEntity itemEntity = itemMapper.itemCreateDtoToItemEntity(body);
+        try {
+            itemRepository.save(itemEntity);
+        } catch (DuplicateKeyException dke) {
+            throw new IllegalArgumentException("Duplicate key, Item name: " + body.name);
+        }
     }
 
  
