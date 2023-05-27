@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -49,7 +50,7 @@ public class BasicStatsService implements StatsService {
     }
 
     @Override
-    public void assignStatsToCharacter(StatsAssignmentDto body) {
+    public void assignStatsToCharacter(String characterId, StatsAssignmentDto body) {
         List<StatsEntity> statsEntities = new ArrayList<StatsEntity>();
         for (Statistic stat : body.stats) {
             statsEntities.add(statsMapper.apiToEntity(stat));
@@ -57,6 +58,13 @@ public class BasicStatsService implements StatsService {
         repository.saveAll(statsEntities);
     }
 
+    @Override
+    public void deleteCharacterStats(String characterId) {
+       HashSet<StatsEntity> statsEntities = this.repository
+              .findById_CharacterId(characterId)
+              .orElseThrow(() -> new NotFoundException("No stats found for character " + characterId));
 
+         this.repository.deleteAll(statsEntities);
+    }   
 
 }

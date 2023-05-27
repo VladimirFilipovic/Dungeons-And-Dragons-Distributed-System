@@ -61,5 +61,14 @@ public class BasicCharacterSpellsService implements CharacterSpellsService {
          this.characterSpellRepository.delete(characterSpellEntity);
     }
 
+    @Override
+    public void deleteCharacterSpellRecords(String characterId) {
+        HashSet<CharacterSpellEntity> characterSpellEntities = this.characterSpellRepository
+            .findById_CharacterId(characterId)
+            .orElseThrow(() -> new NotFoundException("No spells found for character " + characterId));
+
+        this.characterSpellRepository.deleteAll(characterSpellEntities);
+    }
+
    
 }

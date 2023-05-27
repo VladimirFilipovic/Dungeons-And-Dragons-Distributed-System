@@ -32,4 +32,7 @@ public interface CharacterSpellsService {
                 )
         void removeSpellFromCharacter(@PathVariable String characterId, @RequestBody CharacterSpellRemovalDto body);
 
+        @DeleteMapping(value = "/character/{character-id}/spells")
+        void deleteCharacterSpellRecords(@PathVariable String characterId);
+
 }

@@ -90,4 +90,13 @@ public class BasicInventoryService implements InventoryService {
             );
     }
 
+    @Override
+    public void deleteCharacterInventory(String characterName) {
+        CharacterInventoryEntity inventoryEntity = characterInventoryRepository
+                .findByCharacterId(characterName)
+                .orElseThrow(() -> new NotFoundException("No inventory found for characterId: " + characterName));
+        
+        characterInventoryRepository.delete(inventoryEntity);
+    }
+
 }

@@ -7,11 +7,15 @@ Hopefuly it will make our beloved DM's job easier
 TODO: 
     -spell service fix persistance tests done boy
     - create item method done 
-    - stats service stats same as the items: 
+    - stats service stats same as the items done
         -meaning that we will create stats on our side without using dnd5e api
 
-    -composite service adjustments
-    
+    -composite service adjustments: -currently working on it
+        -add delete methods
+        -update methods so that compiler doesnt scream at us
+        -swagger documentation update
+        -integration service updates with create and delete methods
+            
 
 
 
