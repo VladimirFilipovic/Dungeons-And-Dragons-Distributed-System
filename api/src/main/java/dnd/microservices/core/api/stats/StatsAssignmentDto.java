@@ -1,15 +1,17 @@
 package dnd.microservices.core.api.stats;
 
+import java.util.List;
+
 public class StatsAssignmentDto {
     
-    public String name;
-    public int value;
+    public String characterId;
+    public List<Statistic> stats;
 
     public StatsAssignmentDto() {
     }
 
-    public StatsAssignmentDto(String name, int value) {
-        this.name = name;
-        this.value = value;
+    public StatsAssignmentDto(String characterId, List<Statistic> stats) {
+        this.characterId = characterId;
+        this.stats = stats;
     }
 }

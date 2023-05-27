@@ -29,7 +29,6 @@ public class PersistenceTests {
 
     @Autowired
     private CharacterSpellRepository repository;
-
     private CharacterSpellEntity savedEntity;
 
     @Before

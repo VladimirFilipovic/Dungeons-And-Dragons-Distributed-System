@@ -1,6 +1,5 @@
 package dnd.microservices.spellsservice.persistance;
 
-
 public class CharacterSpellKey {
     
     private String characterId;
