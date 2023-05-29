@@ -1,53 +1,24 @@
 package dnd.microservices.core.api.composite;
 
 import dnd.microservices.core.api.items.Item;
+import dnd.microservices.core.api.items.inventory.InventoryItem;
 import dnd.microservices.core.api.spells.Spell;
+import dnd.microservices.core.api.spells.characterSpells.CharacterSpell;
 import dnd.microservices.core.api.stats.Statistic;
 
 import java.util.List;
 
 public class CharacterComposite {
 
-    public String getId() {
-        return id;
-    }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getRace() {
-        return race;
-    }
-
-    public String getReligion() {
-        return religion;
-    }
-
-    public String getServiceAddress() {
-        return serviceAddress;
-    }
-
-    public List<Item> getItems() {
-        return items;
-    }
-
-    public List<Spell> getSpells() {
-        return spells;
-    }
-
-    public List<Statistic> getStats() {
-        return stats;
-    }
-
-    private final String id;
-    private final String name;
-    private final String race;
-    private final String religion;
-    private final String serviceAddress;
-    private final List<Item> items;
-    private final List<Spell> spells;
-    private final List<Statistic> stats;
+    public final String id;
+    public final String name;
+    public final String race;
+    public final String religion;
+    public final String serviceAddress;
+    public final List<InventoryItem> items;
+    public final List<CharacterSpell> spells;
+    public final List<Statistic> stats;
 
 
     public CharacterComposite(
@@ -56,8 +27,8 @@ public class CharacterComposite {
             String race,
             String religion,
             String serviceAddress,
-            List<Item> items,
-            List<Spell> spells,
+            List<InventoryItem> items,
+            List<CharacterSpell> spells,
             List<Statistic> stats
     ) {
         this.id = id;

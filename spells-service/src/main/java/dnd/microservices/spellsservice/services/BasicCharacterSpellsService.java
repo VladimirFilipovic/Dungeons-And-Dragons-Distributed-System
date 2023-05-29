@@ -53,10 +53,10 @@ public class BasicCharacterSpellsService implements CharacterSpellsService {
     }
 
     @Override
-    public void removeSpellFromCharacter(String characterId, CharacterSpellRemovalDto body) {
+    public void removeSpellFromCharacter(String characterId, String spellName) {
        CharacterSpellEntity characterSpellEntity = this.characterSpellRepository
-              .findById(new CharacterSpellKey(characterId, body.spellName))
-              .orElseThrow(() -> new NotFoundException("No spell found for character " + characterId + " with name " + body.spellName));
+              .findById(new CharacterSpellKey(characterId, spellName))
+              .orElseThrow(() -> new NotFoundException("No spell found for character " + characterId + " with name " + spellName));
         
          this.characterSpellRepository.delete(characterSpellEntity);
     }

@@ -5,10 +5,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dnd.microservices.core.api.character.Character;
 import dnd.microservices.core.api.character.CharacterService;
 import dnd.microservices.core.api.items.Item;
+import dnd.microservices.core.api.items.ItemCreateDto;
 import dnd.microservices.core.api.items.ItemsService;
+import dnd.microservices.core.api.items.inventory.InventoryItem;
+import dnd.microservices.core.api.items.inventory.InventoryItemModificationDto;
+import dnd.microservices.core.api.items.inventory.InventoryService;
 import dnd.microservices.core.api.spells.Spell;
 import dnd.microservices.core.api.spells.SpellsService;
+import dnd.microservices.core.api.spells.characterSpells.CharacterSpell;
+import dnd.microservices.core.api.spells.characterSpells.CharacterSpellAssignmentDto;
+import dnd.microservices.core.api.spells.characterSpells.CharacterSpellRemovalDto;
+import dnd.microservices.core.api.spells.characterSpells.CharacterSpellsService;
 import dnd.microservices.core.api.stats.Statistic;
+import dnd.microservices.core.api.stats.StatsAssignmentDto;
 import dnd.microservices.core.api.stats.StatsService;
 import dnd.microservices.core.utils.exceptions.InvalidInputException;
 import dnd.microservices.core.utils.exceptions.NotFoundException;
@@ -29,7 +38,9 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
-public class IntegrationService implements CharacterService, ItemsService, SpellsService, StatsService {
+public class IntegrationService implements CharacterService, ItemsService, InventoryService, SpellsService,
+        CharacterSpellsService, StatsService {
+
     private static final Logger LOG = LoggerFactory.getLogger(IntegrationService.class);
 
     private final RestTemplate restTemplate;
@@ -64,6 +75,7 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
         this.statsServiceUrl = this.getServiceUrl(statsServiceHost, statsServicePort, "stats");
     }
 
+    //#region character
 
     /**
      * @param characterName
@@ -79,37 +91,57 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
             LOG.debug("Found a product with id: {}", character.getId());
 
             return character;
-
-
         } catch (HttpClientErrorException ex) {
-
-//            HttpStatusCode statusCode = ex.getStatusCode();
-//            if (statusCode.equals(NOT_FOUND)) {
-//                throw new NotFoundException(getErrorMessage(ex));
-//            } else if (statusCode.equals(UNPROCESSABLE_ENTITY)) {
-//                throw new InvalidInputException(getErrorMessage(ex));
-//            }
             LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
             LOG.warn("Error body: {}", ex.getResponseBodyAsString());
             throw ex;
         }
     }
 
-    /**
-     * @param characterName
-     * @return
-     */
     @Override
-    public List<Item> getItems(String characterName) {
-        String requestUrl = itemsServiceUrl + "?characterName=" + characterName;
+    public Character createCharacter(Character body) {
+        try {
+            String requestUrl = characterServiceUrl;
+            LOG.debug("Will call Character API on URL: {}", requestUrl);
+
+            Character character = restTemplate.postForObject(requestUrl, body, Character.class);
+            LOG.debug("Created a product with id: {}", character.getId());
+
+            return character;
+        } catch (HttpClientErrorException ex) {
+            LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+            LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+            throw ex;
+        }
+    }
+
+    @Override
+    public void deleteCharacter(String characterId) {
+        try {
+            String requestUrl = characterServiceUrl + "/" + characterId;
+            LOG.debug("Will call Character API on URL: {}", requestUrl);
+
+            restTemplate.delete(requestUrl);
+        } catch (HttpClientErrorException ex) {
+            LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+            LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+            throw ex;
+        }
+    }
+    //#endregion
+    
+    //#region items service
+
+    @Override
+    public List<Item> getItems() {
         List<Item> items = restTemplate.exchange(
-                requestUrl,
+                itemsServiceUrl,
                 GET,
                 null,
-                new ParameterizedTypeReference<List<Item>>() {}
-        ).getBody();
+                new ParameterizedTypeReference<List<Item>>() {
+                }).getBody();
 
-        return  items;
+        return items;
     }
 
     /**
@@ -124,147 +156,229 @@ public class IntegrationService implements CharacterService, ItemsService, Spell
         return item;
     }
 
-    /**
-     * @param itemName
-     * @param inventoryId
-     */
     @Override
-    public void addItemToInventory(String itemName, String inventoryId) {
-        throw new Error("not implemented");
-    }
-
-    /**
-     * @param itemName
-     * @param inventoryId
-     */
-    @Override
-    public void removeItemFromInventory(String itemName, String inventoryId) {
-        throw new Error("not implemented");
-    }
-
-    /**
-     * @param characterName
-     * @return
-     */
-    @Override
-    public List<Spell> getSpells(String characterName) {
-        String requestUrl = spellsServiceUrl + "?characterName=" + characterName;
-        List<Spell> spells = this.restTemplate.exchange(
-                requestUrl,
-                GET,
-                null,
-                new ParameterizedTypeReference<List<Spell>>() {}
-        ).getBody();
-
-        return spells;
-    }
-
-    /**
-     * @param spellName
-     * @return
-     */
-    @Override
-    public Spell getSpell(String spellName) {
-        String requestUrl = spellsServiceUrl + "/" + spellName;
-        Spell spell = this.restTemplate.getForObject(requestUrl, Spell.class);
-
-        return  spell;
-    }
-
-    /**
-     * @param spellName
-     * @param characterName
-     */
-    @Override
-    public void assignSpellToCharacter(String spellName, String characterName) {
-        throw new Error("not implemented");
-    }
-
-    /**
-     * @param spellName
-     * @param characterName
-     */
-    @Override
-    public void unAssignSpellFromCharacter(String spellName, String characterName) {
-        throw new Error("not implemented");
-    }
-
-    /**
-     * @param statisticName
-     * @return
-     */
-    @Override
-    public Statistic getStatistic(String statisticName) {
-        String requestUrl = this.statsServiceUrl + "/" + statisticName;
-        Statistic statistic = this.restTemplate.getForObject(requestUrl, Statistic.class);
-
-        return  statistic;
-    }
-
-    /**
-     * @param characterName
-     * @return
-     */
-    @Override
-    public List<Statistic> getStats(String characterName) {
-        String requestUrl = this.statsServiceUrl + "?characterName=" + characterName;
-        List<Statistic> statistics = this.restTemplate.exchange(
-                requestUrl,
-                GET,
-                null,
-                new ParameterizedTypeReference<List<Statistic>>(){}
-        ).getBody();
-
-        return  statistics;
-    }
-
-    /**
-     * @param characterName
-     * @param statisticName
-     * @param newValue
-     */
-    @Override
-    public void changeCharacterStats(String characterName, String statisticName, Integer newValue) {
-        throw new Error("not implemented");
-    }
-
-    private String getServiceUrl(String host, int port, String serviceName) {
-        return "http://" + host + ":" + port + "/" + serviceName;
-    }
-
-    private String getErrorMessage(HttpClientErrorException ex) {
+    public void createItem(ItemCreateDto body) {
         try {
-            return mapper.readValue(ex.getResponseBodyAsString(), HttpErrorInfo.class).getMessage();
-        } catch (IOException ioex) {
-            return ex.getMessage();
+            String requestUrl = itemsServiceUrl;
+            LOG.debug("Will call Items API on URL: {}", requestUrl);
+
+            restTemplate.postForObject(requestUrl, body, Item.class);
+            LOG.debug("Created an item with name: {}", body.name);
+        } catch (HttpClientErrorException ex) {
+            LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+            LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+            throw ex;
         }
     }
 
-
     @Override
-    public void assignStatsToCharacter(String characterName, List<Statistic> stats) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'assignStatsToCharacter'");
+    public List<InventoryItem> getCharacterInventory(String characterId) {
+        String requestUrl = "/characters/" + characterId + "/inventory";
+        List<InventoryItem> inventoryItems = restTemplate.exchange(
+                requestUrl,
+                GET,
+                null,
+                new ParameterizedTypeReference<List<InventoryItem>>() {
+                }).getBody();
+
+        return inventoryItems;
     }
 
-
     @Override
-    public List<Item> getItems() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getItems'");
+    public void modifyCharacterInventory(String characterId, InventoryItemModificationDto body) {
+        try {
+            String requestUrl = "/characters/" + characterId + "/inventory";
+            LOG.debug("Will call Items API on URL: {}", requestUrl);
+
+            restTemplate.put(requestUrl, body);
+            LOG.debug("Modified an item with id: {}", body.itemId);
+        } catch (HttpClientErrorException ex) {
+            LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+            LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+            throw ex;
+        }
     }
 
-
     @Override
-    public Character createCharacter(Character body) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createCharacter'");
+    public void deleteCharacterInventory(String characterId) {
+        try {
+            String requestUrl = "/characters/" + characterId + "/inventory";
+            LOG.debug("Will call Items API on URL: {}", requestUrl);
+
+            restTemplate.delete(requestUrl);
+            LOG.debug("Deleted all items for character: {}", characterId);
+        } catch (HttpClientErrorException ex) {
+            LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+            LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+            throw ex;
+        }
     }
 
+    //#endregion items service
+    
+    //#region spells service
+    /**
+     * @param spellName
+     * @return
+     */   @Override
+    public Spell getSpell(String spellName) {
+       try {
+            String requestUrl = spellsServiceUrl + "/" + spellName;
+            LOG.debug("Will call Spells API on URL: {}", requestUrl);
+
+            Spell spell = restTemplate.getForObject(requestUrl, Spell.class);
+            LOG.debug("Found a spell with name: {}", spell.getName());
+
+            return spell;
+        } catch (HttpClientErrorException ex) {
+            LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+            LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+            throw ex;
+        }
+    }
 
     @Override
-    public void deleteCharacter(String characterId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteCharacter'");
+    public List<CharacterSpell> getCharacterSpells(String characterId) {
+       try {
+            String requestUrl = "/character/" + characterId + "/spells";
+            LOG.debug("Will call Spells API on URL: {}", requestUrl);
+
+            List<CharacterSpell> characterSpells = restTemplate.exchange(
+                requestUrl,
+                GET,
+                null,
+                new ParameterizedTypeReference<List<CharacterSpell>>() {
+                }).getBody();
+
+            return characterSpells;
+        } catch (HttpClientErrorException ex) {
+            LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+            LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+            throw ex;
+        }
+    }
+
+    @Override
+    public void assignSpellToCharacter(String characterId, CharacterSpellAssignmentDto body) {
+        try {
+            String requestUrl = "/character/" +  characterId + "/spells";
+            LOG.debug("Will call Spells API on URL: {}", requestUrl);
+
+            restTemplate.put(requestUrl, body, CharacterSpell.class);
+            LOG.debug("Assigned a spell with name: {}", body.spellName);
+        } catch (HttpClientErrorException ex) {
+            LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+            LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+            throw ex;
+        }
+    }
+
+    @Override
+    public void removeSpellFromCharacter(String characterId, String spellName) {
+        try {
+            String requestUrl = "/character/" +  characterId + "/spells/" + spellName;
+            LOG.debug("Will call Spells API on URL: {}", requestUrl);
+
+            restTemplate.delete(requestUrl);
+            LOG.debug("Removed a spell with name: {}", spellName);
+        } catch (HttpClientErrorException ex) {
+            LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+            LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+            throw ex;
+        }
+    }
+
+    @Override
+    public void deleteCharacterSpellRecords(String characterId) {
+        try {
+            String requestUrl = "/character/" +  characterId + "/spells/";
+            LOG.debug("Will call Spells API on URL: {}", requestUrl);
+
+            restTemplate.delete(requestUrl);
+            LOG.debug("Deleted all spells for character with id: {}", characterId);
+        } catch (HttpClientErrorException ex) {
+            LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+            LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+            throw ex;
+        }
+    }
+    //#endregion
+
+    //#region stats service
+    public List<Statistic> getStats(String characterId) {
+       try {
+            String requestUrl = "character/" + characterId + "/stats";
+
+            LOG.debug("Will call Stats API on URL: {}", requestUrl);
+
+            List<Statistic> stats = restTemplate.exchange(
+                requestUrl,
+                GET,
+                null,
+                new ParameterizedTypeReference<List<Statistic>>() {
+                }).getBody();
+
+            return stats;
+        } catch (HttpClientErrorException ex) {
+            LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+            LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+            throw ex;
+        }
+    }
+
+    @Override
+    public List<Statistic> getStats(String characterId, String statName) {
+       try {
+            String requestUrl = "character/" + characterId + "/stats?statName=" +  statName;
+
+
+            LOG.debug("Will call Stats API on URL: {}", requestUrl);
+
+            List<Statistic> stats = restTemplate.exchange(
+                requestUrl,
+                GET,
+                null,
+                new ParameterizedTypeReference<List<Statistic>>() {
+                }).getBody();
+
+            return stats;
+        } catch (HttpClientErrorException ex) {
+            LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+            LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+            throw ex;
+        }
+    }
+
+    @Override
+    public void assignStatsToCharacter(String characterId, StatsAssignmentDto body) {
+        try {
+            String requestUrl = "character/" + characterId + "/stats";
+            LOG.debug("Will call Stats API on URL: {}", requestUrl);
+
+            restTemplate.put(requestUrl, body, Statistic.class);
+            LOG.debug("Assigned a stats for character with id: {}", characterId);
+        } catch (HttpClientErrorException ex) {
+            LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+            LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+        }
+    }
+
+    @Override
+    public void deleteCharacterStats(String characterId) {
+        try {
+            String requestUrl = "character/" + characterId + "/stats";
+            LOG.debug("Will call Stats API on URL: {}", requestUrl);
+
+            restTemplate.delete(requestUrl);
+            LOG.debug("Deleted all stats for character with id: {}", characterId);
+        } catch (HttpClientErrorException ex) {
+            LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+            LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+        }
+    }
+    //#endregion
+
+    private String getServiceUrl(String host, int port, String serviceName) {
+        return "http://" + host + ":" + port + "/" + serviceName;
     }
 }

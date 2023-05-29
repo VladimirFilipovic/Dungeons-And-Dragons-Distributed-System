@@ -4,7 +4,9 @@ import dnd.microservices.core.api.character.Character;
 import dnd.microservices.core.api.composite.CharacterComposite;
 import dnd.microservices.core.api.composite.CharacterCompositeService;
 import dnd.microservices.core.api.items.Item;
+import dnd.microservices.core.api.items.inventory.InventoryItem;
 import dnd.microservices.core.api.spells.Spell;
+import dnd.microservices.core.api.spells.characterSpells.CharacterSpell;
 import dnd.microservices.core.api.stats.Statistic;
 import dnd.microservices.core.utils.http.ServiceUtil;
 import io.swagger.annotations.Api;
@@ -37,17 +39,18 @@ public class BasicCharacterCompositeService implements CharacterCompositeService
     @Override
     public CharacterComposite getCharacterData(String characterName) {
         Character character = this.integration.getCharacter(characterName);
-        List<Item> items = this.integration.getItems(characterName);
-        List<Spell> spells = this.integration.getSpells(characterName);
-        List<Statistic> stats = this.integration.getStats(characterName);
+        String characterId = character.getId();
+        List<InventoryItem> items = this.integration.getCharacterInventory(characterId);
+        List<CharacterSpell> spells = this.integration.getCharacterSpells(characterId);
+        List<Statistic> stats = this.integration.getStats(characterId);
 
         return createCharacterAggregate(character, items, spells, stats, serviceUtil.getServiceAddress());
     }
 
     private CharacterComposite createCharacterAggregate(
             Character character,
-            List<Item> items,
-            List<Spell> spells,
+            List<InventoryItem>  items,
+            List<CharacterSpell>spells,
             List<Statistic> stats,
             String serviceAddress
     ) {

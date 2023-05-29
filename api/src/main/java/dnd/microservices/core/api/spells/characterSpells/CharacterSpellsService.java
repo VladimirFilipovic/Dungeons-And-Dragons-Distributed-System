@@ -26,11 +26,11 @@ public interface CharacterSpellsService {
         void assignSpellToCharacter(@PathVariable String characterId, @RequestBody CharacterSpellAssignmentDto body);
 
         @DeleteMapping(
-                value = "/character/{character-id}/spells", 
+                value = "/character/{character-id}/spells/{spell-name}", 
                 consumes = "application/json",
                  produces = "application/json"
                 )
-        void removeSpellFromCharacter(@PathVariable String characterId, @RequestBody CharacterSpellRemovalDto body);
+        void removeSpellFromCharacter(@PathVariable String characterId, @PathVariable String spellName);
 
         @DeleteMapping(value = "/character/{character-id}/spells")
         void deleteCharacterSpellRecords(@PathVariable String characterId);

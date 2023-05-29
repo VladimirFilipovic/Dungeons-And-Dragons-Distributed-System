@@ -11,8 +11,14 @@ TODO:
         -meaning that we will create stats on our side without using dnd5e api
 
     -composite service adjustments: -currently working on it
-        -add delete methods
+        -add delete methods - check
         -update methods so that compiler doesnt scream at us
+            -character service [done] 
+            -items service
+            -inventory service
+            -spells service
+            -character spells service
+            -stats service
         -swagger documentation update
         -integration service updates with create and delete methods
             

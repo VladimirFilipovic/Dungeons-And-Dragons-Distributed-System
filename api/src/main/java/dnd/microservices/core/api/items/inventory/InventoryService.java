@@ -5,25 +5,25 @@ import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
 public interface InventoryService {
     
     @GetMapping(
-            value    = "/characters/{character-name}/inventory",
+            value    = "/characters/{characterId}/inventory",
             produces = "application/json"
         )
-    List<InventoryItem> getCharacterInventory(@PathVariable String characterName);
+    List<InventoryItem> getCharacterInventory(@PathVariable String characterId);
    
-    @PostMapping(
-        value = "/characters/{character-name}/inventory", 
+    @PutMapping(
+        value = "/characters/{characterId}/inventory", 
         consumes = "application/json",
         produces = "application/json"
     )
-    void modifyCharacterInventory(@PathVariable String characterName, InventoryItemModificationDto body);
+    void modifyCharacterInventory(@PathVariable String characterId, InventoryItemModificationDto body);
 
     @DeleteMapping(
-        value = "/characters/{character-name}/inventory"
+        value = "/characters/{characterId}/inventory"
     ) 
-    void deleteCharacterInventory(@PathVariable String characterName);
+    void deleteCharacterInventory(@PathVariable String characterId);
 }

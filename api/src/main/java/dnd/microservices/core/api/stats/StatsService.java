@@ -30,7 +30,7 @@ public interface StatsService {
         @RequestBody StatsAssignmentDto body);
 
     @DeleteMapping (
-            value = "/{characterId}/stats"
+            value = "/characters/{characterId}/stats"
     )
     public void deleteCharacterStats(
         @PathVariable(name = "characterId") String characterId
