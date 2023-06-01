@@ -31,9 +31,9 @@ public class BasicCharacterService implements CharacterService {
     //TODO: consider changing id from string to int https://stackoverflow.com/questions/3298814/how-does-performance-of-guids-compare-to-strings-in-sql
     //TODO: picture of the character
     @Override
-    public Character getCharacter(String characterName) {
-        CharacterEntity characterEntity = characterRepository.findByName(characterName)
-                .orElseThrow(() -> new NotFoundException("No character found for name: " + characterName));
+    public Character getCharacter(String characterId) {
+        CharacterEntity characterEntity = characterRepository.findById(characterId)
+                .orElseThrow(() -> new NotFoundException("No character found for id: " + characterId));
         Character character = characterMapper.entityToApi(characterEntity);
         character.setServiceAddress(serviceUtil.getServiceAddress());
         return character;
@@ -46,7 +46,7 @@ public class BasicCharacterService implements CharacterService {
         CharacterEntity newCharacterEntity = characterRepository.save(characterEntity);
         return characterMapper.entityToApi(newCharacterEntity);
       } catch (DuplicateKeyException dke) {
-        throw new IllegalArgumentException("Duplicate key, Character Name: " + body.getName());
+        throw new IllegalArgumentException("Duplicate key, Character Name: " + body.name);
       }
     }
 

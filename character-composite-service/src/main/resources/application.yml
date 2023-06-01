@@ -26,6 +26,29 @@ api:
                     # Expected partial and error responses
                     ## Non-existing character name
                     404 - A <b>Not Found</b> error will be returned
+        create-composite-character:
+            description: Creates a composite character
+            notes: |
+                # Normal response
+                The composite character information posted to the API will be 
+                splitted up and stored as separate character-info, spells, stats and 
+                inventory entities.
+
+                # Expected error responses
+                1. If a character with the same name as specified in the posted 
+                information already exists, an <b>422 - Unprocessable Entity</b> 
+                error with a "duplicate key" error message will be returned
+
+        delete-composite-character:
+        description: Deletes a product character
+        notes: |
+            # Normal response
+            Entities for character stats, spells, items and  inventory
+            related to the specificed character will be deleted.
+            The implementation of the delete method is idempotent, that is, it 
+            can be called several times with the same response.
+            This means that a delete request of a non existing product will 
+            return <b>200 Ok</b>.
 
 server.port: 7000
 

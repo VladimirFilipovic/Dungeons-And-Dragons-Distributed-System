@@ -14,11 +14,11 @@ TODO:
         -add delete methods - check
         -update methods so that compiler doesnt scream at us
             -character service [done] 
-            -items service
-            -inventory service
-            -spells service
-            -character spells service
-            -stats service
+            -items service [done]
+            -inventory service [done]
+            -spells service [done]
+            -character spells service [done]
+            -stats service [done]
         -swagger documentation update
         -integration service updates with create and delete methods
             

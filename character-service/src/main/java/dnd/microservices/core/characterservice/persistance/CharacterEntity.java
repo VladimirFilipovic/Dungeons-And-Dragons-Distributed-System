@@ -22,9 +22,7 @@ public class CharacterEntity {
     private String race;
     private String religion;
     private String serviceAddress;
-    private List<String> items;
-    private List<String> spells;
-    private List<String> stats;
+
 
     public void setId(String id) {
         this.id = id;
@@ -43,18 +41,6 @@ public class CharacterEntity {
 
     public void setServiceAddress(String serviceAddress) {
         this.serviceAddress = serviceAddress;
-    }
-
-    public void setItems(List<String> items) {
-        this.items = items;
-    }
-
-    public void setSpells(List<String> spells) {
-        this.spells = spells;
-    }
-
-    public void setStats(List<String> stats) {
-        this.stats = stats;
     }
 
     public String getId() {

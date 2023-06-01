@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import dnd.microservices.core.api.spells.characterSpells.CharacterSpell;
 import dnd.microservices.core.api.spells.characterSpells.CharacterSpellAssignmentDto;
-import dnd.microservices.core.api.spells.characterSpells.CharacterSpellRemovalDto;
 import dnd.microservices.core.api.spells.characterSpells.CharacterSpellsService;
 import dnd.microservices.core.utils.exceptions.NotFoundException;
 import dnd.microservices.spellsservice.persistance.CharacterSpellEntity;

@@ -8,7 +8,7 @@ public class CharacterSpell {
     public int level;
 
     public int getDamage() {
-        return spell.getDamageAtLevel().get(level);
+        return spell.damageAtLevel.get(level);
     }
 
     public CharacterSpell() {

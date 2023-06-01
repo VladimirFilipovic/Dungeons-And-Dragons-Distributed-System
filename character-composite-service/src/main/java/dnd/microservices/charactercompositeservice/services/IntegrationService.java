@@ -88,7 +88,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
             LOG.debug("Will call Character API on URL: {}", requestUrl);
 
             Character character = restTemplate.getForObject(requestUrl, Character.class);
-            LOG.debug("Found a product with id: {}", character.getId());
+            LOG.debug("Found a product with id: {}", character.id);
 
             return character;
         } catch (HttpClientErrorException ex) {
@@ -105,7 +105,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
             LOG.debug("Will call Character API on URL: {}", requestUrl);
 
             Character character = restTemplate.postForObject(requestUrl, body, Character.class);
-            LOG.debug("Created a product with id: {}", character.getId());
+            LOG.debug("Created a product with id: {}", character.id);
 
             return character;
         } catch (HttpClientErrorException ex) {
@@ -227,7 +227,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
             LOG.debug("Will call Spells API on URL: {}", requestUrl);
 
             Spell spell = restTemplate.getForObject(requestUrl, Spell.class);
-            LOG.debug("Found a spell with name: {}", spell.getName());
+            LOG.debug("Found a spell with name: {}", spell.name);
 
             return spell;
         } catch (HttpClientErrorException ex) {

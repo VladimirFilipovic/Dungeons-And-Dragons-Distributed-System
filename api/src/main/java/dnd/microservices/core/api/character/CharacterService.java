@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 public interface CharacterService {
     @GetMapping(
-            value = "/character/{characterName}",
+            value = "/character/{characterId}",
             produces = "application/json")
-    Character getCharacter(@PathVariable String characterName);
+    Character getCharacter(@PathVariable String characterId);
 
     @PostMapping(
             value = "/character",

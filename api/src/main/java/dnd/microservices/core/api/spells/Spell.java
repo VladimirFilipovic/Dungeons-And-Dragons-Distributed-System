@@ -3,52 +3,15 @@ package dnd.microservices.core.api.spells;
 import java.util.Map;
 
 public class Spell {
-    private final String id;
-
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public int getRange() {
-        return range;
-    }
-
-    public String getDuration() {
-        return duration;
-    }
-
-    public String getCastingTime() {
-        return castingTime;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public Map<Integer, Integer> getDamageAtLevel() {
-        return damageAtLevel;
-    }
-
-    public String getServiceAdress() {
-        return serviceAdress;
-    }
-
-    private final String name;
-    private final String description;
-    private final int range;
-    private final String duration;
-    private final String castingTime;
-    private final int level;
-    private final Map<Integer, Integer> damageAtLevel;
-    private final String serviceAdress;
+    public final String id;
+    public final String name;
+    public final String description;
+    public final int range;
+    public final String duration;
+    public final String castingTime;
+    public final int level;
+    public final Map<Integer, Integer> damageAtLevel;
+    public final String serviceAdress;
 
     public Spell(String id, String name, String description, int range, String duration, String castingTime, int level, Map<Integer, Integer> damageAtLevel
                  ,String serviceAdress) {
