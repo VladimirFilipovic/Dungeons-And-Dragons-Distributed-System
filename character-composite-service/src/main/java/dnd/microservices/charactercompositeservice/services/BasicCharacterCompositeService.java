@@ -94,8 +94,7 @@ public class BasicCharacterCompositeService implements CharacterCompositeService
         if (characterComposite.spells != null) {
             List<CharacterSpell> characterSpells = characterComposite.spells;
             for (CharacterSpell characterSpell : characterSpells) {
-                CharacterSpellAssignmentDto spellAssignment = new CharacterSpellAssignmentDto(characterSpell.spell.name,
-                        characterSpell.level);
+                CharacterSpellAssignmentDto spellAssignment = new CharacterSpellAssignmentDto(characterSpell.spell.name, characterSpell.level);
                 this.integration.assignSpellToCharacter(character.id, spellAssignment);
             }
         }

@@ -12,7 +12,8 @@ import dnd.microservices.inventoryservice.persistance.characterInventory.*;
 @Table(name = "items", indexes = { @Index(name = "items_name_index", unique = true, columnList = "name") })
 public class ItemEntity {
 
-    @Id @GeneratedValue
+    @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int id;
     
     @Version
