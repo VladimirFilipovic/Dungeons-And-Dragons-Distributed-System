@@ -4,6 +4,8 @@ services:
   character:
     build: character-service
     mem_limit: 350m
+    ports:
+      - "8083:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
@@ -12,6 +14,8 @@ services:
   spells:
     build: spells-service
     mem_limit: 350m
+    ports:
+      - "8082:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
@@ -20,6 +24,8 @@ services:
   items:
     build: Inventory-service
     mem_limit: 350m
+    ports:
+      - "8081:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
@@ -38,30 +44,36 @@ services:
   stats:
     build: stats-service
     mem_limit: 350m
+    ports:
+      - "8084:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       - mongodb
 
-mongodb:
-  image: mongo:3.6.9
-  mem_limit: 350m
-  ports:
-    - "27017:27017"
-  command: mongod --smallfiles
+  mongodb:
+    image: mongo:3.6.9
+    mem_limit: 350m
+    environment:
+      - MAX_INCOMING_CONNECTIONS=100
+      - MAX_CONNS=200
+      - MAX_CONNS_PER_HOST=50
+    ports:
+      - "27017:27017"
+    command: mongod --smallfiles
 
-mysql:
-  image: mysql:5.7
-  mem_limit: 350m
-  ports:
-    - "3306:3306"
-  environment:
-    - MYSQL_ROOT_PASSWORD=rootpwd
-    - MYSQL_DATABASE=items-db
-    - MYSQL_USER=user
-    - MYSQL_PASSWORD=pwd
-  healthcheck:
-    test: ["CMD", "mysqladmin" ,"ping", "-uuser", "-ppwd", "-h", "localhost"]
-    interval: 10s
-    timeout: 5s
-    retries: 10
+  mysql:
+    image: mysql:5.7
+    mem_limit: 350m
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpwd
+      - MYSQL_DATABASE=items-db
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=pwd
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-uuser", "-ppwd", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10

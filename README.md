@@ -21,12 +21,11 @@ TODO:
             -stats service [done]
         -swagger documentation update
         -integration service updates with create and delete methods
-            
+                
 
 
+Starting containers can be done with following script: start-em-all.bash
 
-Running database tests: 
-    ./gradlew {service-name}-service:test --tests {test-name}
-
-Example: 
-    ./gradlew stats-service:test --tests PersistenceTests
+In order to run e2e tests you need to have docker installed and running on your machine
+First step is to run all container with the following script: ./start-em-all.bash
+Then you can run the tests with the following script: e2e-tests.bash

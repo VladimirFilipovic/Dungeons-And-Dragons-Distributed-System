@@ -11,13 +11,14 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @ComponentScan("dnd.microservices")
 public class StatsServiceApplication {
-
 	private static final Logger LOG = LoggerFactory.getLogger(StatsServiceApplication.class);
 
 	public static void main(String[] args) {
-		ConfigurableApplicationContext ctx = SpringApplication.run(StatsServiceApplication.class, args);
+			ConfigurableApplicationContext ctx = SpringApplication.run(StatsServiceApplication.class, args);
 
-		String mysqlUri = ctx.getEnvironment().getProperty("spring.datasource.url");
-		LOG.info("Connected to MySQL: " + mysqlUri);
+		String mongodDbHost = ctx.getEnvironment().getProperty("spring.data.mongodb.host");
+		String mongodDbPort = ctx.getEnvironment().getProperty("spring.data.mongodb.port");
+
+		LOG.info("Connected to MongoDb: " + mongodDbHost + ":" + mongodDbPort);
 	}
 }

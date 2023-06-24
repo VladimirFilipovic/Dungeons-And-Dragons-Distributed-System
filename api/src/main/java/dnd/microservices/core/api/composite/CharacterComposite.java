@@ -1,24 +1,39 @@
 package dnd.microservices.core.api.composite;
 
-import dnd.microservices.core.api.items.Item;
+import java.util.List;
+
 import dnd.microservices.core.api.items.inventory.InventoryItem;
-import dnd.microservices.core.api.spells.Spell;
 import dnd.microservices.core.api.spells.characterSpells.CharacterSpell;
 import dnd.microservices.core.api.stats.Statistic;
 
-import java.util.List;
-
 public class CharacterComposite {
+    public String id;
+    public String name;
+    public String race;
+    public String religion;
+    public String serviceAddress;
+    public List<InventoryItem> items;
+    public List<CharacterSpell> spells;
+    public List<Statistic> stats;
 
-
-    public final String id;
-    public final String name;
-    public final String race;
-    public final String religion;
-    public final String serviceAddress;
-    public final List<InventoryItem> items;
-    public final List<CharacterSpell> spells;
-    public final List<Statistic> stats;
+    
+    public CharacterComposite(
+            String name,
+            String race,
+            String religion,
+            List<InventoryItem> items,
+            List<CharacterSpell> spells,
+            List<Statistic> stats
+    ) {
+        this.id = null;
+        this.name = name;
+        this.race = race;
+        this.religion = religion;
+        this.items = items;
+        this.spells = spells;
+        this.stats = stats;
+        this.serviceAddress = null;
+    }
 
 
     public CharacterComposite(

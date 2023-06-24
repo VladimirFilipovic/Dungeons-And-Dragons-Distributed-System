@@ -1,41 +1,41 @@
 package dnd.microservices.charactercompositeservice.services;
 
+import static org.springframework.http.HttpMethod.GET;
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import dnd.microservices.core.api.character.Character;
 import dnd.microservices.core.api.character.CharacterService;
+import dnd.microservices.core.api.dnd5e.DndSpell;
 import dnd.microservices.core.api.items.Item;
 import dnd.microservices.core.api.items.ItemCreateDto;
 import dnd.microservices.core.api.items.ItemsService;
 import dnd.microservices.core.api.items.inventory.InventoryItem;
 import dnd.microservices.core.api.items.inventory.InventoryItemModificationDto;
 import dnd.microservices.core.api.items.inventory.InventoryService;
-import dnd.microservices.core.api.spells.Spell;
 import dnd.microservices.core.api.spells.SpellsService;
 import dnd.microservices.core.api.spells.characterSpells.CharacterSpell;
 import dnd.microservices.core.api.spells.characterSpells.CharacterSpellAssignmentDto;
-import dnd.microservices.core.api.spells.characterSpells.CharacterSpellRemovalDto;
 import dnd.microservices.core.api.spells.characterSpells.CharacterSpellsService;
 import dnd.microservices.core.api.stats.Statistic;
-import dnd.microservices.core.api.stats.StatsAssignmentDto;
 import dnd.microservices.core.api.stats.StatsService;
-import dnd.microservices.core.utils.exceptions.InvalidInputException;
-import dnd.microservices.core.utils.exceptions.NotFoundException;
-import dnd.microservices.core.utils.http.HttpErrorInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
-
-import java.io.IOException;
-import java.util.List;
 
 @Component
 public class IntegrationService implements CharacterService, ItemsService, InventoryService, SpellsService,
@@ -51,6 +51,18 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
     private final String itemsServiceUrl;
     private final String spellsServiceUrl;
     private final String statsServiceUrl;
+
+    private String itemsServiceHost;
+
+    private int itemsServicePort;
+
+    private String spellsServiceHost;
+
+    private int spellsServicePort;
+
+    private String statsServiceHost;
+
+    private int statsServicePort;
 
 
     @Autowired
@@ -68,11 +80,18 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
     ) {
         this.restTemplate = restTemplate;
         this.mapper = objectMapper;
+        this.itemsServiceHost = itemsServiceHost;
+        this.itemsServicePort = itemsServicePort;
+        this.spellsServiceHost = spellsServiceHost;
+        this.spellsServicePort = spellsServicePort;
+        this.statsServiceHost = statsServiceHost;
+        this.statsServicePort = statsServicePort;
+
         mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-        this.characterServiceUrl = this.getServiceUrl(characterServiceHost, characterServicePort, "character");
+        this.characterServiceUrl = this.getServiceUrl(characterServiceHost, characterServicePort, "characters");
         this.itemsServiceUrl = this.getServiceUrl(itemsServiceHost, itemsServicePort, "items");
         this.spellsServiceUrl = this.getServiceUrl(spellsServiceHost, spellsServicePort, "spells");
-        this.statsServiceUrl = this.getServiceUrl(statsServiceHost, statsServicePort, "stats");
+        this.statsServiceUrl = this.getServiceUrl(statsServiceHost, statsServicePort, "characters");
     }
 
     //#region character
@@ -157,13 +176,13 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
     }
 
     @Override
-    public void createItem(ItemCreateDto body) {
+    public Item createItem(ItemCreateDto body) {
         try {
             String requestUrl = itemsServiceUrl;
             LOG.debug("Will call Items API on URL: {}", requestUrl);
-
-            restTemplate.postForObject(requestUrl, body, Item.class);
+            Item item = restTemplate.postForObject(requestUrl, body, Item.class);
             LOG.debug("Created an item with name: {}", body.name);
+            return item;
         } catch (HttpClientErrorException ex) {
             LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
             LOG.warn("Error body: {}", ex.getResponseBodyAsString());
@@ -172,8 +191,22 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
     }
 
     @Override
+    public void deleteItem(String itemName) {
+        try {
+            String requestUrl = itemsServiceUrl + "/" + itemName;
+            LOG.debug("Will call Items API on URL: {}", requestUrl);
+
+            restTemplate.delete(requestUrl);
+            LOG.debug("Deleted an item with name: {}", itemName);
+        } catch (HttpClientErrorException ex) {
+            LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+            throw ex;
+        }
+    }
+
+    @Override
     public List<InventoryItem> getCharacterInventory(String characterId) {
-        String requestUrl = "/characters/" + characterId + "/inventory";
+        String requestUrl = "http://" + itemsServiceHost + ":" + itemsServicePort + "/characters/" + characterId + "/inventory";
         List<InventoryItem> inventoryItems = restTemplate.exchange(
                 requestUrl,
                 GET,
@@ -187,7 +220,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
     @Override
     public void modifyCharacterInventory(String characterId, InventoryItemModificationDto body) {
         try {
-            String requestUrl = "/characters/" + characterId + "/inventory";
+            String requestUrl = "http://" + itemsServiceHost + ":" + itemsServicePort + "/characters/" + characterId + "/inventory";
             LOG.debug("Will call Items API on URL: {}", requestUrl);
 
             restTemplate.put(requestUrl, body);
@@ -200,9 +233,32 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
     }
 
     @Override
+    public void createCharacterInventory(String characterId) {
+        try {
+            String requestUrl = "http://" + itemsServiceHost + ":" + itemsServicePort + "/characters/" + characterId + "/inventory";
+
+            // Set headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // Create the request entity with empty body and headers
+            HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+
+            // Make the HTTP request
+            LOG.debug("Will call Items API on URL: {}", requestUrl);
+            ResponseEntity<Void> response = restTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity, Void.class);
+            LOG.debug("Created inventory for character: {}", characterId);
+        } catch (HttpClientErrorException ex) {
+            LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+            LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+            throw ex;
+        }
+    }
+
+    @Override
     public void deleteCharacterInventory(String characterId) {
         try {
-            String requestUrl = "/characters/" + characterId + "/inventory";
+            String requestUrl = "http://" + itemsServiceHost + ":" + itemsServicePort + "/characters/" + characterId + "/inventory";
             LOG.debug("Will call Items API on URL: {}", requestUrl);
 
             restTemplate.delete(requestUrl);
@@ -221,12 +277,12 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
      * @param spellName
      * @return
      */   @Override
-    public Spell getSpell(String spellName) {
+    public DndSpell getSpell(String spellName) {
        try {
             String requestUrl = spellsServiceUrl + "/" + spellName;
             LOG.debug("Will call Spells API on URL: {}", requestUrl);
 
-            Spell spell = restTemplate.getForObject(requestUrl, Spell.class);
+            DndSpell spell = restTemplate.getForObject(requestUrl, DndSpell.class);
             LOG.debug("Found a spell with name: {}", spell.name);
 
             return spell;
@@ -240,7 +296,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
     @Override
     public List<CharacterSpell> getCharacterSpells(String characterId) {
        try {
-            String requestUrl = "/character/" + characterId + "/spells";
+            String requestUrl = "http://" + spellsServiceHost + ":" + spellsServicePort + "/characters/" + characterId + "/spells";
             LOG.debug("Will call Spells API on URL: {}", requestUrl);
 
             List<CharacterSpell> characterSpells = restTemplate.exchange(
@@ -261,7 +317,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
     @Override
     public void assignSpellToCharacter(String characterId, CharacterSpellAssignmentDto body) {
         try {
-            String requestUrl = "/character/" +  characterId + "/spells";
+             String requestUrl = "http://" + spellsServiceHost + ":" + spellsServicePort + "/characters/" + characterId + "/spells";
             LOG.debug("Will call Spells API on URL: {}", requestUrl);
 
             restTemplate.put(requestUrl, body, CharacterSpell.class);
@@ -276,7 +332,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
     @Override
     public void removeSpellFromCharacter(String characterId, String spellName) {
         try {
-            String requestUrl = "/character/" +  characterId + "/spells/" + spellName;
+             String requestUrl = "http://" + spellsServiceHost + ":" + spellsServicePort + "/characters/" + characterId + "/spells" + "/" + spellName;
             LOG.debug("Will call Spells API on URL: {}", requestUrl);
 
             restTemplate.delete(requestUrl);
@@ -291,7 +347,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
     @Override
     public void deleteCharacterSpellRecords(String characterId) {
         try {
-            String requestUrl = "/character/" +  characterId + "/spells/";
+             String requestUrl = "http://" + spellsServiceHost + ":" + spellsServicePort + "/characters/" + characterId + "/spells" ;
             LOG.debug("Will call Spells API on URL: {}", requestUrl);
 
             restTemplate.delete(requestUrl);
@@ -307,7 +363,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
     //#region stats service
     public List<Statistic> getStats(String characterId) {
        try {
-            String requestUrl = "character/" + characterId + "/stats";
+            String requestUrl =statsServiceUrl + "/" + characterId + "/stats";
 
             LOG.debug("Will call Stats API on URL: {}", requestUrl);
 
@@ -329,8 +385,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
     @Override
     public List<Statistic> getStats(String characterId, String statName) {
        try {
-            String requestUrl = "character/" + characterId + "/stats?statName=" +  statName;
-
+            String requestUrl = statsServiceUrl + "/"  + characterId + "/stats?statName=" +  statName;
 
             LOG.debug("Will call Stats API on URL: {}", requestUrl);
 
@@ -350,12 +405,11 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
     }
 
     @Override
-    public void assignStatsToCharacter(String characterId, StatsAssignmentDto body) {
+    public void assignStatsToCharacter(String characterId, List<Statistic> body) {
         try {
-            String requestUrl = "character/" + characterId + "/stats";
-            LOG.debug("Will call Stats API on URL: {}", requestUrl);
-
-            restTemplate.put(requestUrl, body, Statistic.class);
+            String requestUrl = statsServiceUrl + "/" + characterId + "/stats";
+            LOG.debug("Will call Stats API on URL: {}", requestUrl);            
+            restTemplate.put(requestUrl, body);
             LOG.debug("Assigned a stats for character with id: {}", characterId);
         } catch (HttpClientErrorException ex) {
             LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
@@ -366,9 +420,8 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
     @Override
     public void deleteCharacterStats(String characterId) {
         try {
-            String requestUrl = "character/" + characterId + "/stats";
+            String requestUrl =statsServiceUrl + "/" + characterId + "/stats";
             LOG.debug("Will call Stats API on URL: {}", requestUrl);
-
             restTemplate.delete(requestUrl);
             LOG.debug("Deleted all stats for character with id: {}", characterId);
         } catch (HttpClientErrorException ex) {
@@ -381,4 +434,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
     private String getServiceUrl(String host, int port, String serviceName) {
         return "http://" + host + ":" + port + "/" + serviceName;
     }
+
+
+
 }

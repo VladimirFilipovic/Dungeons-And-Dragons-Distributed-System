@@ -50,10 +50,16 @@ public class BasicStatsService implements StatsService {
     }
 
     @Override
-    public void assignStatsToCharacter(String characterId, StatsAssignmentDto body) {
+    public void assignStatsToCharacter(String characterId, List<Statistic> statistics) {
         List<StatsEntity> statsEntities = new ArrayList<StatsEntity>();
-        for (Statistic stat : body.stats) {
-            statsEntities.add(statsMapper.apiToEntity(stat));
+        for (Statistic stat : statistics) {
+            if (repository.existsById(new StatsKey(characterId, stat.name.name()))) {
+                StatsEntity statsEntity = repository.findById(new StatsKey(characterId, stat.name.name())).get();
+                statsEntity.setValue(stat.value);
+                statsEntities.add(statsEntity);
+            } else {
+                statsEntities.add(statsMapper.apiToEntity(characterId, stat));
+            }
         }
         repository.saveAll(statsEntities);
     }

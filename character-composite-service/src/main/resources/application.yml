@@ -54,8 +54,8 @@ server.port: 7000
 
 app:
     character-service:
-      host: localhost
-      port: 7001
+        host: localhost
+        port: 7001
     spells-service:
         host: localhost
         port: 7002
@@ -73,14 +73,14 @@ server.port: 8080
 
 app:
     character-service:
-        host: character
-        port: 8080
+        host: localhost
+        port: 8083
     spells-service:
-        host: spells
-        port: 8080
+        host: localhost
+        port: 8082
     items-service:
-        host: items
-        port: 8080
+        host: localhost
+        port: 8081
     stats-service:
-        host: stats
-        port: 8080
+        host: localhost
+        port: 8084

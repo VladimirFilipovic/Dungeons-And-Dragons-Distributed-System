@@ -55,6 +55,7 @@ public class BasicInventoryService implements InventoryService {
 
     @Override
     public void modifyCharacterInventory(String characterId, InventoryItemModificationDto body) {
+        
         this.characterInventoryItemEntityRepository
             .findById(new CharacterInventoryItemKey(characterId, body.itemId))
             .ifPresentOrElse(
@@ -91,12 +92,18 @@ public class BasicInventoryService implements InventoryService {
     }
 
     @Override
-    public void deleteCharacterInventory(String characterName) {
+    public void deleteCharacterInventory(String characterId) {
         CharacterInventoryEntity inventoryEntity = characterInventoryRepository
-                .findByCharacterId(characterName)
-                .orElseThrow(() -> new NotFoundException("No inventory found for characterId: " + characterName));
+                .findByCharacterId(characterId)
+                .orElseThrow(() -> new NotFoundException("No inventory found for characterId: " + characterId));
         
         characterInventoryRepository.delete(inventoryEntity);
+    }
+
+    @Override
+    public void createCharacterInventory(String characterId) {
+        CharacterInventoryEntity inventoryEntity = new CharacterInventoryEntity(characterId);
+        characterInventoryRepository.save(inventoryEntity);
     }
 
 }

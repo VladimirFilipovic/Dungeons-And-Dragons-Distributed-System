@@ -16,6 +16,6 @@ logging:
 ---
 spring.config.activate.on-profile: docker
 
-spring.data.mongodb.host: mongodb
+spring.data.mongodb.host: mongodb 
 
 server.port: 8080

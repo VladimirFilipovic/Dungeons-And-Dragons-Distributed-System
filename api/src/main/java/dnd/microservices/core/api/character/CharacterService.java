@@ -9,17 +9,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 public interface CharacterService {
     @GetMapping(
-            value = "/character/{characterId}",
+            value = "/characters/{characterId}",
             produces = "application/json")
     Character getCharacter(@PathVariable String characterId);
 
     @PostMapping(
-            value = "/character",
+            value = "/characters",
             consumes = "application/json",
             produces = "application/json"
         )
     Character createCharacter(@RequestBody Character body);
 
-    @DeleteMapping(value = "/character/{characterId}")
+    @DeleteMapping(value = "/characters/{characterId}")
     void deleteCharacter(@PathVariable String characterId);
 }

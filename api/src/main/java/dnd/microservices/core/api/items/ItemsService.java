@@ -18,6 +18,8 @@ public interface ItemsService {
         Item getItem(@PathVariable String itemName);
 
         @PostMapping(value = "/items", consumes = "application/json", produces = "application/json")
-        void createItem(@RequestBody ItemCreateDto body);
+        Item createItem(@RequestBody ItemCreateDto body);
 
+        @DeleteMapping(value = "/items/{itemName}")
+        void deleteItem(@PathVariable String itemName);
 }

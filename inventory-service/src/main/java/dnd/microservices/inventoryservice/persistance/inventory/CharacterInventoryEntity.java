@@ -19,7 +19,7 @@ public class CharacterInventoryEntity {
     @Version
     public int version;
 
-    @OneToMany(mappedBy = "characterInventory")
+    @OneToMany(mappedBy = "characterInventory", fetch = FetchType.EAGER)
     public Set<CharacterInventoryItemEntity> items;
 
     public String serviceAddress;

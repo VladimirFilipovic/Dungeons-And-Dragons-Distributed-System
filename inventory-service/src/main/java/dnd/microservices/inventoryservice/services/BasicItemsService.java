@@ -64,15 +64,22 @@ public class BasicItemsService implements ItemsService {
     }
 
     @Override
-    public void createItem(ItemCreateDto body) {
+    public Item createItem(ItemCreateDto body) {
+        System.out.println("BasicItemsService.createItem: " + body);
         ItemEntity itemEntity = itemMapper.itemCreateDtoToItemEntity(body);
         try {
-            itemRepository.save(itemEntity);
+            ItemEntity newItemEntity = itemRepository.save(itemEntity);
+            return itemMapper.entityToApi(newItemEntity);
         } catch (DuplicateKeyException dke) {
             throw new IllegalArgumentException("Duplicate key, Item name: " + body.name);
         }
     }
 
- 
+    @Override
+    public void deleteItem(String itemName) {
+        ItemEntity item = itemRepository.findByName(itemName)
+          .orElseThrow(() -> new NotFoundException("No item found for name: " + itemName));
+        itemRepository.delete(item);
+    }
 
 }

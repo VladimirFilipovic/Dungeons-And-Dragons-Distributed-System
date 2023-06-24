@@ -1,20 +1,16 @@
 package dnd.microservices.core.api.spells.characterSpells;
 
-import dnd.microservices.core.api.spells.Spell;
+import dnd.microservices.core.api.dnd5e.DndSpell;
 
 public class CharacterSpell {
    
-    public Spell spell;
+    public DndSpell spell;
     public int level;
-
-    public int getDamage() {
-        return spell.damageAtLevel.get(level);
-    }
 
     public CharacterSpell() {
     }
 
-    public CharacterSpell(Spell spell, int level) {
+    public CharacterSpell(DndSpell spell, int level) {
         this.spell = spell;
         this.level = level;
     }

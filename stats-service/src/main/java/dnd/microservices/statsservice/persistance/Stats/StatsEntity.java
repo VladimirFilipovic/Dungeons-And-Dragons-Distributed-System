@@ -18,6 +18,38 @@ public class StatsEntity {
     public String serviceAddress;
 
 
+    public StatsKey getId() {
+        return id;
+    }
+
+    public void setId(StatsKey id) {
+        this.id = id;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public String getServiceAddress() {
+        return serviceAddress;
+    }
+
+    public void setServiceAddress(String serviceAddress) {
+        this.serviceAddress = serviceAddress;
+    }
+
     public StatsEntity() {
     }
 

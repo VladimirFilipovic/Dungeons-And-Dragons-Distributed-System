@@ -1,17 +1,16 @@
 package dnd.microservices.core.characterservice.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.mongodb.DuplicateKeyException;
+
 import dnd.microservices.core.api.character.Character;
 import dnd.microservices.core.api.character.CharacterService;
 import dnd.microservices.core.characterservice.persistance.CharacterEntity;
 import dnd.microservices.core.characterservice.persistance.CharacterRepository;
 import dnd.microservices.core.utils.exceptions.NotFoundException;
 import dnd.microservices.core.utils.http.ServiceUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.mongodb.DuplicateKeyException;
-
-import java.util.ArrayList;
 
 @RestController
 public class BasicCharacterService implements CharacterService {
@@ -35,7 +34,7 @@ public class BasicCharacterService implements CharacterService {
         CharacterEntity characterEntity = characterRepository.findById(characterId)
                 .orElseThrow(() -> new NotFoundException("No character found for id: " + characterId));
         Character character = characterMapper.entityToApi(characterEntity);
-        character.setServiceAddress(serviceUtil.getServiceAddress());
+        character.serviceAddress = serviceUtil.getServiceAddress();
         return character;
     }
 

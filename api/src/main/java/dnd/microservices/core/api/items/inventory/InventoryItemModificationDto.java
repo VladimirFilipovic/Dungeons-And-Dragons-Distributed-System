@@ -8,6 +8,30 @@ public class InventoryItemModificationDto {
 
     public ModificationType modificationType;
    
+    public int getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(int itemId) {
+        this.itemId = itemId;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    public ModificationType getModificationType() {
+        return modificationType;
+    }
+
+    public void setModificationType(ModificationType modificationType) {
+        this.modificationType = modificationType;
+    }
+
     public InventoryItemModificationDto() {
     }
 

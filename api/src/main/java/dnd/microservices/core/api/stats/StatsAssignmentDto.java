@@ -6,6 +6,14 @@ public class StatsAssignmentDto {
     
     public List<Statistic> stats;
 
+    public List<Statistic> getStats() {
+        return stats;
+    }
+
+    public void setStats(List<Statistic> stats) {
+        this.stats = stats;
+    }
+
     public StatsAssignmentDto() {
     }
 

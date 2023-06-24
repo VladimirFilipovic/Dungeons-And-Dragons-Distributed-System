@@ -1,27 +1,22 @@
 package dnd.microservices.spellsservice;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import dnd.microservices.spellsservice.persistance.CharacterSpellEntity;
 import dnd.microservices.spellsservice.persistance.CharacterSpellKey;
 import dnd.microservices.spellsservice.persistance.CharacterSpellRepository;
-
-import java.io.Console;
-import java.util.HashMap;
-import java.util.Optional;
-
-import static org.junit.Assert.*;
-import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
 @RunWith(SpringRunner.class)
 @DataMongoTest

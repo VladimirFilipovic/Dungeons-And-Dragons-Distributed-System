@@ -2,13 +2,10 @@
 : ${PORT=8080}
 
 echo "Gradle build"
-./gradlew build
-
-echo "Docker compose"
-docker-compose build 
+./gradlew build -x test
 
 echo "Docker up"
-docker-compose up -d
+docker-compose up -d --build
 
 docker-compose logs -f
 

@@ -1,0 +1,1 @@
+./gradlew character-composite-service:test

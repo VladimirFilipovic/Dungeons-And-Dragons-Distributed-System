@@ -6,13 +6,12 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 public interface StatsService {
     @GetMapping(
-            value = "/characters/{characterid}/stats",
+            value = "/characters/{characterId}/stats",
             produces = "application/json"
     )
     List<Statistic> getStats(
@@ -21,13 +20,13 @@ public interface StatsService {
         );
 
     @PutMapping(
-            value = "/characters/{characterid}/stats",
+            value = "/characters/{characterId}/stats",
             consumes = "application/json",
             produces = "application/json"
     ) 
     public void assignStatsToCharacter(
         @PathVariable(name = "characterId") String characterId,
-        @RequestBody StatsAssignmentDto body);
+        @RequestBody List<Statistic> body);
 
     @DeleteMapping (
             value = "/characters/{characterId}/stats"

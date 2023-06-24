@@ -1,19 +1,20 @@
 package dnd.microservices.core.characterservice.services;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 
 import dnd.microservices.core.api.character.Character;
 import dnd.microservices.core.characterservice.persistance.CharacterEntity;
 
 @Mapper(componentModel = "spring")
-public class CharacterMapper {
+public interface CharacterMapper {
 
-    public CharacterEntity apiToEntity(Character body) {
-        return null;
-    }
+     @Mappings({
+        @Mapping(target = "serviceAddress", ignore = true)
+    })   
+    public CharacterEntity apiToEntity(Character body);
 
-    public Character entityToApi(CharacterEntity newCharacterEntity) {
-        return null;
-    }
+    public Character entityToApi(CharacterEntity newCharacterEntity);
 
 }
