@@ -32,7 +32,8 @@ dependencies {
 	implementation project(':utils')
 	implementation('org.springframework.boot:spring-boot-starter-actuator')
 	implementation('org.springframework.boot:spring-boot-starter-webflux')
-	implementation('org.springframework.boot:spring-boot-starter-data-mongodb')
+	implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
+	
 	implementation("org.mapstruct:mapstruct:${mapstructVersion}")
 
 	compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
@@ -40,6 +41,13 @@ dependencies {
 	testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
+	
+	testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-stream-test-support', version: '3.1.4'
+
 	testImplementation('io.projectreactor:reactor-test')
 	testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
+}
+
+test {
+    systemProperty 'spring.profiles.active', 'default'
 }

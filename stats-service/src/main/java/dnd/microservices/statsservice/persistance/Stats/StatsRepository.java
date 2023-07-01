@@ -1,11 +1,13 @@
 package dnd.microservices.statsservice.persistance.Stats;
 
-import java.util.HashSet;
-import java.util.Optional;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
-public interface StatsRepository extends CrudRepository<StatsEntity, StatsKey> {
-     Optional<HashSet<StatsEntity>> findById_CharacterId(String characterId);
-     Optional<StatsEntity> findById(StatsKey id);
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+
+public interface StatsRepository extends ReactiveCrudRepository<StatsEntity, StatsKey> {
+     Flux<StatsEntity> findById_CharacterId(String characterId);
+     Mono<StatsEntity> findById(StatsKey id);
 }

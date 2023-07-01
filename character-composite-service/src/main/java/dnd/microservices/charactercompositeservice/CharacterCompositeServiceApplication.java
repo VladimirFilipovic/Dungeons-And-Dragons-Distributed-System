@@ -11,6 +11,7 @@ import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import static java.util.Collections.emptyList;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -19,6 +20,7 @@ import static springfox.documentation.spi.DocumentationType.SWAGGER_2;
 
 @SpringBootApplication
 @ComponentScan("dnd.microservices")
+@EnableSwagger2
 public class CharacterCompositeServiceApplication {
 
 	@Value("${api.common.version}")           String apiVersion;

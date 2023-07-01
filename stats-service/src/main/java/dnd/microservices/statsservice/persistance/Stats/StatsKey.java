@@ -1,7 +1,8 @@
 package dnd.microservices.statsservice.persistance.Stats;
 
+import java.io.Serializable;
 
-public class StatsKey {
+public class StatsKey implements Serializable {
     public String characterId;
 
     public String statisticName;

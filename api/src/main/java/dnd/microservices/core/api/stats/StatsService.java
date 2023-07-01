@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import reactor.core.publisher.Flux;
+
 public interface StatsService {
     @GetMapping(
             value = "/characters/{characterId}/stats",
             produces = "application/json"
     )
-    List<Statistic> getStats(
+    Flux<Statistic> getStats(
         @PathVariable(name = "characterId") String characterId,
         @RequestParam(name = "statName", required = false) String statName
         );

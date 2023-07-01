@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import reactor.core.publisher.Flux;
 
 public interface CharacterSpellsService {
 
@@ -15,7 +16,7 @@ public interface CharacterSpellsService {
                 value = "/characters/{characterId}/spells", 
                 produces = "application/json"
                 )
-        List<CharacterSpell> getCharacterSpells(@PathVariable String characterId);
+        Flux<CharacterSpell> getCharacterSpells(@PathVariable String characterId);
 
         @PutMapping(
                         value = "/characters/{characterId}/spells", 

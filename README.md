@@ -29,3 +29,6 @@ Starting containers can be done with following script: start-em-all.bash
 In order to run e2e tests you need to have docker installed and running on your machine
 First step is to run all container with the following script: ./start-em-all.bash
 Then you can run the tests with the following script: e2e-tests.bash
+
+
+Swagger location: http://localhost:8080/swagger-ui/index.html

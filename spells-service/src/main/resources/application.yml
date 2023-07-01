@@ -18,3 +18,12 @@ spring.config.activate.on-profile: docker
 spring.data.mongodb.host: mongodb
 
 server.port: 8080
+
+
+---
+spring.config.activate.on-profile: test
+
+spring.data.mongodb.host: localhost
+
+server.port: 7002
+

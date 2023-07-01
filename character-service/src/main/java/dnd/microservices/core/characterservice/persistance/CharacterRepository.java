@@ -1,10 +1,9 @@
 package dnd.microservices.core.characterservice.persistance;
 
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
-import java.util.Optional;
+import reactor.core.publisher.Mono;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
-
-public interface CharacterRepository extends PagingAndSortingRepository<CharacterEntity, String> {
-    Optional<CharacterEntity> findByName(String name);
+public interface CharacterRepository extends ReactiveCrudRepository<CharacterEntity, String> {
+    Mono<CharacterEntity> findByName(String name);
 }

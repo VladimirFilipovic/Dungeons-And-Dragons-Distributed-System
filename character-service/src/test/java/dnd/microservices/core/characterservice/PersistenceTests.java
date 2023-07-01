@@ -15,9 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.yaml.snakeyaml.constructor.DuplicateKeyException;
 
 import dnd.microservices.core.characterservice.persistance.CharacterEntity;
 import dnd.microservices.core.characterservice.persistance.CharacterRepository;
+import reactor.test.StepVerifier;
 
 @RunWith(SpringRunner.class)
 @DataMongoTest
@@ -30,86 +32,86 @@ public class PersistenceTests {
 
     @Before
    	public void setupDb() {
-   		repository.deleteAll();
-
+   		repository.deleteAll().block();
         CharacterEntity entity = new CharacterEntity("Miroljub", "Aaraorca", "None", "Unknown");
-        savedEntity = repository.save(entity);
+          StepVerifier.create(repository.save(entity))
+            .expectNextMatches(createdEntity -> {
+                savedEntity = createdEntity;
+                return areCharactersEqual(entity, savedEntity);
+            })
+            .verifyComplete();
     }
 
     @Test
    	public void create() {
         CharacterEntity newEntity = new CharacterEntity("Miroljub 2", "Aaraorca", "None", "Unknown");
         
-        CharacterEntity newSavedEntity = repository.save(newEntity);
-
-        Optional<CharacterEntity> foundEntity = repository.findById(newSavedEntity.getId());
-
-        assertEqualsCharacter(newSavedEntity, foundEntity.get());
-        assertEquals(2, repository.count());
+        CharacterEntity newSavedEntity = repository.save(newEntity).block();
+        
+        StepVerifier.create(repository.findById(newSavedEntity.id)).expectNextMatches(foundEntity -> areCharactersEqual(newEntity, foundEntity)).verifyComplete();
     }
 
-
-    @Test
-   	public void update() {
+     @Test
+    public void update() {
         savedEntity.setReligion("Random description");
-        repository.save(savedEntity);
 
-        CharacterEntity foundEntity = repository.findById(savedEntity.getId()).get();
-        assertEquals(2, foundEntity.getVersion());
-        assertEquals(savedEntity.getReligion(), foundEntity.getReligion());
+        StepVerifier.create(repository.save(savedEntity))
+            .expectNextCount(1)
+            .verifyComplete();
+
+        StepVerifier.create(repository.findById(savedEntity.id))
+            .expectNextMatches(foundEntity -> areCharactersEqual(foundEntity, savedEntity))
+            .verifyComplete();
     }
 
      @Test
    	 public void delete() {
-         repository.delete(savedEntity);
-         assertFalse(repository.existsById(savedEntity.getId()));
+        StepVerifier.create(repository.delete(savedEntity)).verifyComplete();
+
+        StepVerifier.create(repository.existsById(savedEntity.id))
+            .expectNext(false)
+            .verifyComplete();
      }
 
      @Test
    	 public void getById() {
-         Optional<CharacterEntity> entity = repository.findById(savedEntity.getId());
-         assertTrue(entity.isPresent());
-         assertEqualsCharacter(savedEntity, entity.get());
+         StepVerifier.create(repository.findById(savedEntity.id))
+            .expectNextMatches(entity -> areCharactersEqual(entity, savedEntity))
+            .verifyComplete();
      }
 
-     @Test(expected = Exception.class)
+     @Test
      public void duplicateError() {
-        CharacterEntity entity = new CharacterEntity("Miroljub", "Aaraorca", "None", "Unknown");
-        entity.setId(savedEntity.getId());
-        repository.save(entity);
+         CharacterEntity entity = new CharacterEntity("Miroljub", "Aaraorca", "None", "Unknown");
+         entity.setId(savedEntity.id);
+        StepVerifier.create(repository.save(entity)).verifyError();
     }
 
     @Test
    	public void optimisticLockError() {
+        CharacterEntity entity1 = repository.findById(savedEntity.id).block();
+        CharacterEntity entity2 = repository.findById(savedEntity.id).block();
 
-        // Store the saved entity in two separate entity objects
-        CharacterEntity entity1 = repository.findById(savedEntity.getId()).get();
-        CharacterEntity entity2 = repository.findById(savedEntity.getId()).get();
-
-        // Update the entity using the first entity object
         entity1.setRace("Random race");
-        repository.save(entity1);
 
-        //  Update the entity using the second entity object.
-        // This should fail since the second entity now holds a old version number, i.e. a Optimistic Lock Error
-        try {
-            entity2.setRace("Random race");
-            repository.save(entity2);
+        StepVerifier.create(repository.save(entity1))
+            .expectNextCount(1)
+            .verifyComplete();
 
-            fail("Expected an OptimisticLockingFailureException");
-        } catch (OptimisticLockingFailureException e) {}
+        StepVerifier.create(repository.save(entity2))
+            .expectError(OptimisticLockingFailureException.class)
+            .verify();
 
-        // Get the updated entity from the database and verify its new sate
-        CharacterEntity updatedEntity = repository.findById(savedEntity.getId()).get();
-        assertEquals(2, (int)updatedEntity.getVersion());
-        assertEquals("Random race", updatedEntity.getRace());
+        StepVerifier.create(repository.findById(savedEntity.id))
+            .expectNextMatches(updatedEntity -> updatedEntity.version == 2 && updatedEntity.race.equals("Random race"))
+            .verifyComplete();
     }
 
-    private void assertEqualsCharacter(CharacterEntity expectedEntity, CharacterEntity actualEntity) {
-        assertEquals(expectedEntity.getId(), actualEntity.getId());
-        assertEquals(expectedEntity.getName(), actualEntity.getName());
-        assertEquals(expectedEntity.getRace(), actualEntity.getRace());
-        assertEquals(expectedEntity.getReligion(), actualEntity.getReligion());
+    private boolean areCharactersEqual(CharacterEntity expectedEntity, CharacterEntity actualEntity) {
+       return  expectedEntity.id.equals(actualEntity.id) &&
+               expectedEntity.getName().equals(actualEntity.getName()) &&
+               expectedEntity.getRace().equals(actualEntity.getRace()) &&
+               expectedEntity.getReligion().equals(actualEntity.getReligion());
     }
 
 }

@@ -1,11 +1,14 @@
 package dnd.microservices.spellsservice.persistance;
 
-import java.util.HashSet;
-import java.util.Optional;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
-public interface CharacterSpellRepository extends CrudRepository<CharacterSpellEntity, CharacterSpellKey> {
-    Optional<HashSet<CharacterSpellEntity>> findById_CharacterId(String characterId);
-    Optional<HashSet<CharacterSpellEntity>> findById_SpellName(String spellName);
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+
+public interface CharacterSpellRepository extends ReactiveCrudRepository<CharacterSpellEntity, CharacterSpellKey> {
+    Flux<CharacterSpellEntity> findById_CharacterId(String characterId);
+    Flux<CharacterSpellEntity> findById_SpellName(String spellName);
+    Mono<CharacterSpellEntity> findById(CharacterSpellKey id);
 }

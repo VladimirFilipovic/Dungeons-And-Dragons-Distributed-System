@@ -11,6 +11,9 @@ import dnd.microservices.core.characterservice.persistance.CharacterEntity;
 import dnd.microservices.core.characterservice.persistance.CharacterRepository;
 import dnd.microservices.core.utils.exceptions.NotFoundException;
 import dnd.microservices.core.utils.http.ServiceUtil;
+import reactor.core.publisher.Mono;
+import static reactor.core.publisher.Mono.error;
+
 
 @RestController
 public class BasicCharacterService implements CharacterService {
@@ -30,20 +33,18 @@ public class BasicCharacterService implements CharacterService {
     //TODO: consider changing id from string to int https://stackoverflow.com/questions/3298814/how-does-performance-of-guids-compare-to-strings-in-sql
     //TODO: picture of the character
     @Override
-    public Character getCharacter(String characterId) {
-        CharacterEntity characterEntity = characterRepository.findById(characterId)
-                .orElseThrow(() -> new NotFoundException("No character found for id: " + characterId));
-        Character character = characterMapper.entityToApi(characterEntity);
-        character.serviceAddress = serviceUtil.getServiceAddress();
-        return character;
+    public Mono<Character> getCharacter(String characterId) {
+        return characterRepository.findById(characterId)
+                .switchIfEmpty(error(new NotFoundException("No character found for id: " + characterId)))
+                .doOnNext(characterEntity -> characterEntity.serviceAddress = serviceUtil.getServiceAddress())
+                .map(characterMapper::entityToApi);
     }
 
     @Override
     public Character createCharacter(Character body) {
       try {
         CharacterEntity characterEntity = characterMapper.apiToEntity(body);
-        CharacterEntity newCharacterEntity = characterRepository.save(characterEntity);
-        return characterMapper.entityToApi(newCharacterEntity);
+        return characterRepository.save(characterEntity).map(characterMapper::entityToApi).block();
       } catch (DuplicateKeyException dke) {
         throw new IllegalArgumentException("Duplicate key, Character Name: " + body.name);
       }
@@ -51,7 +52,6 @@ public class BasicCharacterService implements CharacterService {
 
     @Override
     public void deleteCharacter(String characterId) {
-      characterRepository.findById(characterId)
-      .ifPresent(e -> characterRepository.delete(e));
+      characterRepository.findById(characterId).blockOptional().ifPresent(characterRepository::delete);
     }
 }

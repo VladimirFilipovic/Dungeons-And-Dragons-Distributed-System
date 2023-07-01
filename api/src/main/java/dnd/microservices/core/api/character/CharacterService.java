@@ -7,11 +7,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import reactor.core.publisher.Mono;
+
 public interface CharacterService {
     @GetMapping(
             value = "/characters/{characterId}",
             produces = "application/json")
-    Character getCharacter(@PathVariable String characterId);
+    Mono<Character> getCharacter(@PathVariable String characterId);
 
     @PostMapping(
             value = "/characters",

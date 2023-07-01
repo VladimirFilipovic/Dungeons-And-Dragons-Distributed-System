@@ -1,19 +1,15 @@
 package dnd.microservices.spellsservice.services;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import dnd.microservices.core.api.spells.characterSpells.CharacterSpell;
 import dnd.microservices.core.api.spells.characterSpells.CharacterSpellAssignmentDto;
 import dnd.microservices.core.api.spells.characterSpells.CharacterSpellsService;
-import dnd.microservices.core.utils.exceptions.NotFoundException;
 import dnd.microservices.spellsservice.persistance.CharacterSpellEntity;
 import dnd.microservices.spellsservice.persistance.CharacterSpellKey;
 import dnd.microservices.spellsservice.persistance.CharacterSpellRepository;
+import reactor.core.publisher.Flux;
 
 @RestController
 public class BasicCharacterSpellsService implements CharacterSpellsService {
@@ -29,45 +25,35 @@ public class BasicCharacterSpellsService implements CharacterSpellsService {
     }
 
     @Override
-    public List<CharacterSpell> getCharacterSpells(String characterId) {
-        HashSet<CharacterSpellEntity> characterSpellEntities = this.characterSpellRepository
-            .findById_CharacterId(characterId)
-            .orElseThrow(() -> new NotFoundException("No spells found for character " + characterId));
-
-        List<CharacterSpell> characterSpells = new ArrayList<CharacterSpell>();
-
-        for (CharacterSpellEntity characterSpellEntity : characterSpellEntities) {
-            characterSpells.add(characterSpellsMapper.entityToApi(characterSpellEntity));
-        }
-
-        return characterSpells;
+    public Flux<CharacterSpell> getCharacterSpells(String characterId) {
+        return this.characterSpellRepository
+                .findById_CharacterId(characterId)
+                .map(characterSpellsMapper::entityToApi);
     }
 
     @Override
     public void assignSpellToCharacter(String characterId, CharacterSpellAssignmentDto body) {
-       this.characterSpellRepository.save(new CharacterSpellEntity(
-              new CharacterSpellKey(characterId, body.spellName),
-              body.spellLevel
-       ));
+        this.characterSpellRepository.save(new CharacterSpellEntity(
+                new CharacterSpellKey(characterId, body.spellName),
+                body.spellLevel)).block();
     }
 
     @Override
     public void removeSpellFromCharacter(String characterId, String spellName) {
-       CharacterSpellEntity characterSpellEntity = this.characterSpellRepository
-              .findById(new CharacterSpellKey(characterId, spellName))
-              .orElseThrow(() -> new NotFoundException("No spell found for character " + characterId + " with name " + spellName));
-        
-         this.characterSpellRepository.delete(characterSpellEntity);
+        CharacterSpellEntity characterSpellEntity = this.characterSpellRepository
+                .findById(new CharacterSpellKey(characterId, spellName)).block();
+
+        if (characterSpellEntity != null) {
+            this.characterSpellRepository.delete(characterSpellEntity).block();
+        }
     }
 
     @Override
     public void deleteCharacterSpellRecords(String characterId) {
-        HashSet<CharacterSpellEntity> characterSpellEntities = this.characterSpellRepository
-            .findById_CharacterId(characterId)
-            .orElseThrow(() -> new NotFoundException("No spells found for character " + characterId));
-
-        this.characterSpellRepository.deleteAll(characterSpellEntities);
+        this.characterSpellRepository
+                .findById_CharacterId(characterId)
+                .flatMap(characterSpellEntity -> this.characterSpellRepository.delete(characterSpellEntity))
+                .subscribe();
     }
 
-   
 }

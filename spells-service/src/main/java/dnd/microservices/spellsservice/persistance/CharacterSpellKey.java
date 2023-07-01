@@ -1,6 +1,8 @@
 package dnd.microservices.spellsservice.persistance;
 
-public class CharacterSpellKey {
+import java.io.Serializable;
+
+public class CharacterSpellKey implements Serializable {
     
     private String characterId;
     private String spellName;
