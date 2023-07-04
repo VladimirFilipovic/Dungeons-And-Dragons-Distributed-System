@@ -1,8 +1,9 @@
 package dnd.microservices.inventoryservice.services;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.function.Supplier;
 
+import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +20,8 @@ import dnd.microservices.inventoryservice.persistance.inventory.CharacterInvento
 import dnd.microservices.inventoryservice.persistance.inventory.CharacterInventoryRepository;
 import dnd.microservices.inventoryservice.persistance.item.ItemEntity;
 import dnd.microservices.inventoryservice.persistance.item.ItemRepository;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Scheduler;
 
 @RestController
 public class BasicInventoryService implements InventoryService {
@@ -28,6 +31,7 @@ public class BasicInventoryService implements InventoryService {
     private final ItemRepository itemRepository;
     private final InventoryMapper inventoryMapper;
     private final ServiceUtil serviceUtil;
+    private final Scheduler scheduler;
 
     @Autowired
     public BasicInventoryService(
@@ -35,22 +39,27 @@ public class BasicInventoryService implements InventoryService {
             CharacterInventoryItemEntityRepository characterInventoryItemEntityRepository,
             ItemRepository itemRepository,
             InventoryMapper inventoryMapper, 
-            ServiceUtil serviceUtil
+            ServiceUtil serviceUtil,
+            Scheduler scheduler
         ) {
         this.characterInventoryRepository = characterInventoryRepository;
         this.characterInventoryItemEntityRepository = characterInventoryItemEntityRepository;
         this.itemRepository = itemRepository;
         this.inventoryMapper = inventoryMapper;
         this.serviceUtil = serviceUtil;
+        this.scheduler = scheduler;
     }
 
     @Override
-    public List<InventoryItem> getCharacterInventory(String characterId) {
-        CharacterInventoryEntity inventoryEntity = characterInventoryRepository
-                .findByCharacterId(characterId)
-                .orElseThrow(() -> new NotFoundException("No inventory found for characterId: " + characterId));
-        
-        return inventoryMapper.entityToApi(inventoryEntity.items);
+    public Flux<InventoryItem> getCharacterInventory(String characterId) {
+        return asyncFlux(() -> Flux.fromIterable(this.getInventoryByCharacterId(characterId)));
+    }
+
+    protected List<InventoryItem> getInventoryByCharacterId(String characterId) {
+        return this.characterInventoryRepository
+            .findByCharacterId(characterId)
+            .map(inventoryEntity -> inventoryMapper.entityToApi(inventoryEntity.items))
+            .orElseThrow(() -> new NotFoundException("No inventory found for characterId: " + characterId));
     }
 
     @Override
@@ -104,6 +113,10 @@ public class BasicInventoryService implements InventoryService {
     public void createCharacterInventory(String characterId) {
         CharacterInventoryEntity inventoryEntity = new CharacterInventoryEntity(characterId);
         characterInventoryRepository.save(inventoryEntity);
+    }
+
+    private <T> Flux<T> asyncFlux(Supplier<Publisher<T>> publisherSupplier) {
+        return Flux.defer(publisherSupplier).subscribeOn(scheduler);
     }
 
 }

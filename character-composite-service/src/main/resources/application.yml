@@ -55,19 +55,24 @@ server.port: 7000
 app:
     character-service:
         host: localhost
-        port: 7001
+        port: 8083
     spells-service:
         host: localhost
-        port: 7002
+        port: 8082
     items-service:
         host: localhost
-        port: 7003
+        port: 8081
     stats-service:
         host: localhost
-        port: 7004
+        port: 8084
 
+spring:
+    profiles:
+    active: default
 ---
-spring.config.activate.on-profile: docker
+
+spring:
+  profiles: docker
 
 server.port: 8080
 

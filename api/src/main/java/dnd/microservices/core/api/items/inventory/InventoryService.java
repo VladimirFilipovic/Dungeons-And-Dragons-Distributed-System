@@ -9,13 +9,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import reactor.core.publisher.Flux;
+
 public interface InventoryService {
     
     @GetMapping(
             value    = "/characters/{characterId}/inventory",
             produces = "application/json"
         )
-    List<InventoryItem> getCharacterInventory(@PathVariable String characterId);
+    Flux<InventoryItem> getCharacterInventory(@PathVariable String characterId);
    
     @PutMapping(
         value = "/characters/{characterId}/inventory", 

@@ -3,6 +3,7 @@ package dnd.microservices.charactercompositeservice.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +19,10 @@ import dnd.microservices.core.api.stats.Statistic;
 import dnd.microservices.core.api.stats.StatsAssignmentDto;
 import dnd.microservices.core.utils.http.ServiceUtil;
 import io.swagger.annotations.Api;
+import reactor.core.publisher.Mono;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Api(description = "REST API for full character information.")
 @RestController
@@ -26,6 +30,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class BasicCharacterCompositeService implements CharacterCompositeService {
     private final ServiceUtil serviceUtil;
     private  IntegrationService integration;
+    private static final Logger LOG = LoggerFactory.getLogger(BasicCharacterCompositeService.class);
 
     @Autowired
     public BasicCharacterCompositeService(
@@ -38,13 +43,23 @@ public class BasicCharacterCompositeService implements CharacterCompositeService
 
 
     @Override
-    public CharacterComposite getCharacterData(String characterId) {
-        Character character = this.integration.getCharacter(characterId);
-        List<InventoryItem> items = this.integration.getCharacterInventory(characterId);
-        List<CharacterSpell> spells = this.integration.getCharacterSpells(characterId);
-        List<Statistic> stats = this.integration.getStats(characterId);
-
-        return createCharacterAggregate(character, items, spells, stats, serviceUtil.getServiceAddress());
+    public Mono<CharacterComposite> getCharacterData(String characterId) {
+        return Mono.zip(
+                values -> createCharacterAggregate(
+                        (Character) values[0],
+                        (List<InventoryItem>) values[1],
+                        (List<CharacterSpell>) values[2],
+                        (List<Statistic>) values[3],
+                        serviceUtil.getServiceAddress()
+                ),
+                this.integration.getCharacter(characterId),
+                this.integration.getCharacterInventory(characterId).collectList(),
+                this.integration.getCharacterSpells(characterId).collectList(),
+                this.integration.getStats(characterId).collectList()
+        ).doOnError(ex -> {
+            LOG.warn("getCharacterData() failed: {}", ex.toString());
+        })
+        .log();
     }
 
     private CharacterComposite createCharacterAggregate(

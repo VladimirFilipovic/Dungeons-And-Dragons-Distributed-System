@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import reactor.core.publisher.Mono;
 
 public interface CharacterCompositeService {
 
@@ -18,7 +19,7 @@ public interface CharacterCompositeService {
                         @ApiResponse(code = 422, message = "Unprocessable entity, input parameters caused the processing to fail. See response message for more information.")
         })
         @GetMapping(value = "/characters/{characterId}", produces = "application/json")
-        public CharacterComposite getCharacterData(@PathVariable String characterId);
+        public Mono<CharacterComposite> getCharacterData(@PathVariable String characterId);
 
         @ApiOperation(value = "${api.character-composite.create-composite-character.description}", notes = "${api.character-composite.create-composite-character.notes}")
         @ApiResponses(value = {

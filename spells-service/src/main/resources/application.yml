@@ -1,29 +1,26 @@
 server.port: 7002
 
-spring.data.mongodb:
-  host: localhost
-  port: 27017
-  database: spells-db
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: spells-db
 
-logging:
-    level:
-        root: INFO
-        dnd.microservices: DEBUG
-        org.springframework.data.mongodb.core.MongoTemplate: DEBUG
-
-
+  logging:
+      level:
+          root: INFO
+          dnd.microservices: DEBUG
+          org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+  profiles:
+    active: default
 ---
-spring.config.activate.on-profile: docker
+spring:
+  profiles: docker
 
-spring.data.mongodb.host: mongodb
+  data:
+    mongodb:
+      host: mongodb
 
-server.port: 8080
-
-
----
-spring.config.activate.on-profile: test
-
-spring.data.mongodb.host: localhost
-
-server.port: 7002
-
+server:
+  port: 8080

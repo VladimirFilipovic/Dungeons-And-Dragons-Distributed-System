@@ -52,14 +52,14 @@ import dnd.microservices.core.api.stats.StatsName;
       itemCreateDto = new ItemCreateDto("testItem");
 		  integrationService.createItem(itemCreateDto);
 
-      Item item = integrationService.getItem("testItem");
+      Item item = integrationService.getItem("testItem").block();
       assertNotNull(item);
       assertEquals(item.name, "testItem");
     }
 
     @Test
     public void CreateSpell() {
-      DndSpell spell = integrationService.getSpell("acid-arrow");
+      DndSpell spell = integrationService.getSpell("acid-arrow").block();
       assertNotNull(spell);
       assertEquals(spell.name, "Acid Arrow");
     }
@@ -69,7 +69,7 @@ import dnd.microservices.core.api.stats.StatsName;
       Character createCharacterDto = new Character("testCharacter", "testRace", "testReligion");
       testCharacterId = integrationService.createCharacter(createCharacterDto).id;
 
-      character = integrationService.getCharacter(testCharacterId);
+      character = integrationService.getCharacter(testCharacterId).block();
       assertNotNull(character);
       assertEquals(character.name, "testCharacter");
     }
@@ -85,7 +85,7 @@ import dnd.microservices.core.api.stats.StatsName;
       statsDto.add(new Statistic(StatsName.AC, 10));
       integrationService.assignStatsToCharacter(testCharacterId, statsDto);
 
-      List<Statistic> stats = integrationService.getStats(testCharacterId);
+      List<Statistic> stats = integrationService.getStats(testCharacterId).collectList().block();
       assertNotNull(stats);
       assertEquals(stats.size(), 2);
     }
@@ -100,7 +100,7 @@ import dnd.microservices.core.api.stats.StatsName;
       inventoryItems.add(inventoryItem);
 
       /* spells */ 
-      DndSpell spell = integrationService.getSpell("acid-arrow");
+      DndSpell spell = integrationService.getSpell("acid-arrow").block();
       CharacterSpell characterSpell = new CharacterSpell(spell, 1);
       List<CharacterSpell> characterSpells = new ArrayList<>();
       characterSpells.add(characterSpell);
@@ -121,7 +121,7 @@ import dnd.microservices.core.api.stats.StatsName;
       CharacterComposite composite = basicCharacterCompositeService.createCharacter(characterComposite);
       assertNotNull(composite);
 
-      characterComposite = basicCharacterCompositeService.getCharacterData(composite.id);
+      characterComposite = basicCharacterCompositeService.getCharacterData(composite.id).block();
       assertNotNull(characterComposite);
       assertEquals(characterComposite.name, "testCharacter3");
       assertNotNull(characterComposite.items);

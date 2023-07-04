@@ -1,25 +1,3 @@
-# server.port: 7001
-
-# spring.data.mongodb.host: localhost
-# spring.data.mongodb.port: 27017
-# spring.data.mongodb.database: character-db
-
-# logging:
-#     level:
-#         root: INFO
-#         dnd.microservices: DEBUG
-#         org.springframework.data.mongodb.core.MongoTemplate: DEBUG
-
-
-
-# ---
-# spring.config.activate.on-profile: docker
-
-# spring.data.mongodb.host: localhost 
-
-# server.port: 8080
-
-# Default profile
 server:
   port: 7001
 
@@ -30,19 +8,18 @@ spring:
       port: 27017
       database: character-db
 
-logging:
-  level:
-    root: INFO
-    dnd.microservices: DEBUG
-    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+  logging:
+    level:
+      root: INFO
+      dnd.microservices: DEBUG
+      org.springframework.data.mongodb.core.MongoTemplate: DEBUG
 
+  profiles:
+    active: default
 ---
 
-# Docker profile
 spring:
-  config:
-    activate:
-      on-profile: docker
+  profiles: docker
 
   data:
     mongodb:

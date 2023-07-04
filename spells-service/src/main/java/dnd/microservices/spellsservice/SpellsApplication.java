@@ -8,6 +8,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.config.EnableWebFlux;
 
 @SpringBootApplication
 @ComponentScan("dnd.microservices")
