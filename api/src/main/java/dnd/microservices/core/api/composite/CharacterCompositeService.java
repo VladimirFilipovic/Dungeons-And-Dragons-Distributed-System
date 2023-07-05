@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -27,7 +28,7 @@ public interface CharacterCompositeService {
                         @ApiResponse(code = 422, message = "Unprocessable entity, input parameters caused the processing to fail. See response message for more information.")
         })
         @PostMapping(value = "/characters", consumes = "application/json", produces = "application/json")
-        public CharacterComposite createCharacter(CharacterComposite characterComposite);
+        public CharacterComposite createCharacter(@RequestBody CharacterComposite characterComposite);
 
         @ApiOperation(value = "${api.character-composite.delete-composite-character.description}", notes = "${api.character-composite.delete-composite-character.notes}")
         @ApiResponses(value = {
@@ -35,6 +36,6 @@ public interface CharacterCompositeService {
                         @ApiResponse(code = 404, message = "Not found, the specified id does not exist."),
                         @ApiResponse(code = 422, message = "Unprocessable entity, input parameters caused the processing to fail. See response message for more information.")
         })
-        @DeleteMapping(value = "/character-composite/{productId}")
-        void deleteCompositeCharacter(@PathVariable String character);
+        @DeleteMapping(value = "/characters/{characterId}")
+        void deleteCompositeCharacter(@PathVariable String characterId);
 }

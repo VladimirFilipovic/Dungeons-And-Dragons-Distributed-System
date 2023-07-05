@@ -91,7 +91,8 @@ public class BasicCharacterCompositeService implements CharacterCompositeService
     public CharacterComposite createCharacter(CharacterComposite characterComposite) {
         Character character = new Character(characterComposite.name, characterComposite.race, characterComposite.religion);
         Character createdCharacter = this.integration.createCharacter(character);
-        
+                    LOG.warn("create character: {}", createdCharacter.toString());
+
         if (characterComposite.items != null) {
             this.integration.createCharacterInventory(createdCharacter.id);
 
