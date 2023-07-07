@@ -1,4 +1,6 @@
 server.port: 7002
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "*" 
 
 spring:
   data:
@@ -7,11 +9,42 @@ spring:
       port: 27017
       database: spells-db
 
+  cloud.stream:
+    defaultBinder: rabbit
+    default.contentType: application/json
+    bindings.input:
+      destination: spells
+      group: spellsGroup
+
+  cloud.stream.bindings.input.consumer:
+    maxAttempts: 3
+    backOffInitialInterval: 500
+    backOffMaxInterval: 1000
+    backOffMultiplier: 2.0
+
+  cloud.stream.rabbit.bindings.input.consumer:
+    autoBindDlq: true
+    republishToDlq: true
+
+  cloud.stream.kafka.bindings.input.consumer:
+    enableDlq: true
+
+  cloud.stream.kafka.binder:
+    brokers: 127.0.0.1
+    defaultBrokerPort: 9092
+
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+
   logging:
       level:
           root: INFO
           dnd.microservices: DEBUG
           org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+
   profiles:
     active: default
 ---
@@ -21,6 +54,10 @@ spring:
   data:
     mongodb:
       host: mongodb
+
+  rabbitmq.host: rabbitmq
+
+  cloud.stream.kafka.binder.brokers: kafka
 
 server:
   port: 8080

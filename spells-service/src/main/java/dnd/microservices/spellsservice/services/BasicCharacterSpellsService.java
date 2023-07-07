@@ -10,6 +10,7 @@ import dnd.microservices.spellsservice.persistance.CharacterSpellEntity;
 import dnd.microservices.spellsservice.persistance.CharacterSpellKey;
 import dnd.microservices.spellsservice.persistance.CharacterSpellRepository;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 public class BasicCharacterSpellsService implements CharacterSpellsService {
@@ -33,9 +34,10 @@ public class BasicCharacterSpellsService implements CharacterSpellsService {
 
     @Override
     public void assignSpellToCharacter(String characterId, CharacterSpellAssignmentDto body) {
-        this.characterSpellRepository.save(new CharacterSpellEntity(
+        Mono<CharacterSpellEntity> saveRes = this.characterSpellRepository.save(new CharacterSpellEntity(
                 new CharacterSpellKey(characterId, body.spellName),
-                body.spellLevel)).block();
+                body.spellLevel));
+        saveRes.block();
     }
 
     @Override
@@ -44,16 +46,17 @@ public class BasicCharacterSpellsService implements CharacterSpellsService {
                 .findById(new CharacterSpellKey(characterId, spellName)).block();
 
         if (characterSpellEntity != null) {
-            this.characterSpellRepository.delete(characterSpellEntity).block();
+           Mono<Void> deleteRes = this.characterSpellRepository.delete(characterSpellEntity);
+              deleteRes.block();
         }
     }
 
     @Override
     public void deleteCharacterSpellRecords(String characterId) {
-        this.characterSpellRepository
+        Flux<Object> deleteRes = this.characterSpellRepository
                 .findById_CharacterId(characterId)
-                .flatMap(characterSpellEntity -> this.characterSpellRepository.delete(characterSpellEntity))
-                .subscribe();
+                .flatMap(characterSpellEntity -> this.characterSpellRepository.delete(characterSpellEntity));
+        deleteRes.collectList().block();
     }
 
 }

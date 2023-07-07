@@ -6,7 +6,7 @@ import static java.time.LocalDateTime.now;
 
 public class Event<K, T> {
 
-    public enum Type {CREATE, DELETE, UPDATE}
+    public enum Type {CREATE, DELETE, UPDATE, CREATE_INV, DELETE_INV, UPDATE_INV, DELETE_SPELL_REC}
 
     private Event.Type eventType;
     private K key;

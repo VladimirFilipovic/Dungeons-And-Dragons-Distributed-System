@@ -21,9 +21,8 @@ public class BasicStatsService implements StatsService {
 
     @Autowired
     public BasicStatsService(
-        StatsRepository repository,
-        StatsMapper statsMapper
-        ) {
+            StatsRepository repository,
+            StatsMapper statsMapper) {
         this.repository = repository;
         this.statsMapper = statsMapper;
     }
@@ -54,15 +53,17 @@ public class BasicStatsService implements StatsService {
                 statsEntities.add(statsMapper.apiToEntity(characterId, stat));
             }
         }
-        repository.saveAll(statsEntities).subscribe();
+        Flux<StatsEntity> saveRes = repository.saveAll(statsEntities);
+        saveRes.collectList().block();
     }
 
     @Override
     public void deleteCharacterStats(String characterId) {
-         this.repository
-              .findById_CharacterId(characterId)
-              .flatMap(statsEntity -> this.repository.delete(statsEntity))
-              .subscribe();
-    }   
+        Flux<Void> deleteRes = this.repository
+                .findById_CharacterId(characterId)
+                .flatMap(statsEntity -> this.repository.delete(statsEntity));
+        deleteRes.collectList().block();
+
+    }
 
 }

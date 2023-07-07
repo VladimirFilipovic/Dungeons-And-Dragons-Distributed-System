@@ -1,5 +1,6 @@
 server.port: 7003
-
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "*"  
 # Strongly recommend to set this property to "none" in a production environment!
 spring.jpa.hibernate.ddl-auto: update
 
@@ -8,6 +9,36 @@ spring:
     url: jdbc:mysql://localhost/items-db
     username: user
     password: pwd
+
+  cloud.stream:
+    defaultBinder: rabbit
+    default.contentType: application/json
+    bindings.input:
+      destination: stats
+      group: statsGroup
+
+  cloud.stream.bindings.input.consumer:
+    maxAttempts: 3
+    backOffInitialInterval: 500
+    backOffMaxInterval: 1000
+    backOffMultiplier: 2.0
+
+  cloud.stream.rabbit.bindings.input.consumer:
+    autoBindDlq: true
+    republishToDlq: true
+
+  cloud.stream.kafka.bindings.input.consumer:
+    enableDlq: true
+
+  cloud.stream.kafka.binder:
+    brokers: 127.0.0.1
+    defaultBrokerPort: 9092
+
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
     
   logging:
     level:
@@ -19,6 +50,7 @@ spring:
   profiles:
     active: default
 
+
 spring.datasource.hikari.initializationFailTimeout: 60000
 ---
 
@@ -27,6 +59,10 @@ spring:
 
   datasource:
     url: jdbc:mysql://mysql/items-db
+  
+  rabbitmq.host: rabbitmq
+
+  cloud.stream.kafka.binder.brokers: kafka
 
 server:
   port: 8080

@@ -44,7 +44,8 @@ public class BasicCharacterService implements CharacterService {
     public Character createCharacter(Character body) {
       try {
         CharacterEntity characterEntity = characterMapper.apiToEntity(body);
-        return characterRepository.save(characterEntity).map(characterMapper::entityToApi).block();
+        Mono<Character> character =  characterRepository.save(characterEntity).map(characterMapper::entityToApi);
+        return character.block();
       } catch (DuplicateKeyException dke) {
         throw new IllegalArgumentException("Duplicate key, Character Name: " + body.name);
       }

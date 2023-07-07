@@ -132,7 +132,7 @@ public class MessagingTests {
         queueInventory.remove();
         InventoryItemModificationDto inventoryItemModificationDto = new InventoryItemModificationDto(item.id, 1,
                 ModificationType.ADD);
-        Event<String, InventoryItemModificationDto> expectedInventoryEvent = new Event<>(Event.Type.CREATE, composite.id,
+        Event<String, InventoryItemModificationDto> expectedInventoryEvent = new Event<>(Event.Type.UPDATE_INV, composite.id,
                 inventoryItemModificationDto);
      
 
@@ -165,7 +165,7 @@ public class MessagingTests {
 
         assertEquals(1, queueInventory.size());
 
-        Event<String, InventoryItemModificationDto> expectedInventoryEvent = new Event<>(Event.Type.DELETE, CHARACTER_ID_OK, null);
+        Event<String, InventoryItemModificationDto> expectedInventoryEvent = new Event<>(Event.Type.DELETE_INV, CHARACTER_ID_OK, null);
         assertThat(queueInventory, is(receivesPayloadThat(sameEventExceptCreatedAt(expectedInventoryEvent))));
 
         assertEquals(1, queueSpells.size());

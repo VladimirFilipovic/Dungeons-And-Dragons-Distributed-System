@@ -51,7 +51,8 @@ api:
             return <b>200 Ok</b>.
 
 server.port: 7000
-
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "*"
 app:
     character-service:
         host: localhost
@@ -97,8 +98,7 @@ app:
         username: guest
         password: guest
 
-    management.endpoint.health.show-details: "ALWAYS"
-    management.endpoints.web.exposure.include: "*"
+
 
 spring:
     profiles:

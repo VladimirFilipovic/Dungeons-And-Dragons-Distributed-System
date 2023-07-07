@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.health.Health;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.http.HttpEntity;
@@ -240,7 +241,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
                 LOG.debug("Will call Item API on URL: {}", requestUrl);
 
                 // TODO: whatch out for the type of the event
-                Event event = new Event<>(Event.Type.CREATE, characterId, body);
+                Event event = new Event<>(Event.Type.UPDATE_INV, characterId, body);
                 Message<Event> message = MessageBuilder
                                 .withPayload(event)
                                 .build();
@@ -257,7 +258,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
                                 + "/inventory";
                 LOG.debug("Will call Item API on URL: {}", requestUrl);
 
-                Event<String, Void> event = new Event<>(Event.Type.CREATE, characterId, null);
+                Event<String, Void> event = new Event<>(Event.Type.CREATE_INV, characterId, null);
                 Message<Event<String, Void>> message = MessageBuilder
                                 .withPayload(event)
                                 .build();
@@ -272,7 +273,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
                                 + "/inventory";
                 LOG.debug("Will call Item API on URL: {}", requestUrl);
 
-                Event<String, Void> event = new Event<>(Event.Type.DELETE, characterId, null);
+                Event<String, Void> event = new Event<>(Event.Type.DELETE_INV, characterId, null);
                 Message<Event<String, Void>> message = MessageBuilder
                                 .withPayload(event)
                                 .build();
@@ -351,7 +352,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
                                 + characterId + "/spells";
                 LOG.debug("Will call Spell API on URL: {}", requestUrl);
 
-                Event<String, Void> event = new Event<>(Event.Type.DELETE, characterId, null);
+                Event<String, Void> event = new Event<>(Event.Type.DELETE_SPELL_REC, characterId, null);
                 Message<Event<String, Void>> message = MessageBuilder
                                 .withPayload(event)
                                 .build();
@@ -420,6 +421,31 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
         // Perform any other necessary operations
         // ...
     }
+
+    public Mono<Health> getCharacterHealth() {
+    return getHealth(characterServiceUrl);
+}
+
+public Mono<Health> getSpellHealth() {
+    return getHealth(spellsServiceUrl);
+}
+
+public Mono<Health> getInventoryHealth() {
+    return getHealth("http://" + itemsServiceHost + ":" + itemsServicePort);
+}
+
+public Mono<Health> getStatsHealth() {
+    return getHealth(statsServiceUrl);
+}
+
+private Mono<Health> getHealth(String url) {
+    url += "/actuator/health";
+    LOG.debug("Will call the Health API on URL: {}", url);
+    return webClient.get().uri(url).retrieve().bodyToMono(String.class)
+            .map(s -> new Health.Builder().up().build())
+            .onErrorResume(ex -> Mono.just(new Health.Builder().down(ex).build()))
+            .log();
+}
 
         // #endregion
 
