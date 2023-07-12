@@ -1,128 +1,127 @@
 api:
-    common:
-        version: 1.0.0
-        title: Sample API
-        description: Description of the API...
-        termsOfServiceUrl: MINE TERMS OF SERVICE URL
-        license: License
-        licenseUrl: MY LICENSE URL
+  common:
+    version: 1.0.0
+    title: Sample API
+    description: Description of the API...
+    termsOfServiceUrl: MINE TERMS OF SERVICE URL
+    license: License
+    licenseUrl: MY LICENSE URL
+    contact:
+      name: Contact
+      url: My
+      email: vlada.19982309@gmail.com
 
-        contact:
-            name: Contact
-            url: My
-            email: vlada.19982309@gmail.com
+character-composite:
+  get-character-data:
+    description: Returns a detailed info for the specified character
+    notes: |
+      # Normal response
+      If the requested character is found, the method will return information regarding:
+      1. Base character information
+      2. Stats
+      3. Spells
+      4. Items
+      5. Service Addresses (technical information regarding the addresses of the microservices that created the response)
 
-    character-composite:
-        get-character-data:
-            description: Returns a detailed info for the specified character
-            notes: |
-                    # Normal response
-                    If the requested character is found the method will return information regarding:
-                    1. Base character information
-                    2. Stats
-                    3. Spells
-                    4. And, Items
-                    1. Service Addresses\n(technical information regarding the addresses of the microservices that created the response)
-                    # Expected partial and error responses
-                    ## Non-existing character name
-                    404 - A <b>Not Found</b> error will be returned
-        create-composite-character:
-            description: Creates a composite character
-            notes: |
-                # Normal response
-                The composite character information posted to the API will be 
-                splitted up and stored as separate character-info, spells, stats and 
-                inventory entities.
+  create-composite-character:
+    description: Creates a composite character
+    notes: |
+      # Normal response
+      The composite character information posted to the API will be split up and stored as separate character-info, spells, stats, and inventory entities.
 
-                # Expected error responses
-                1. If a character with the same name as specified in the posted 
-                information already exists, an <b>422 - Unprocessable Entity</b> 
-                error with a "duplicate key" error message will be returned
+  delete-composite-character:
+    description: Deletes a product character
+    notes: |
+      # Normal response
+      Entities for character stats, spells, items, and inventory related to the specified character will be deleted. The implementation of the delete method is idempotent, meaning that it can be called several times with the same response. This means that a delete request for a non-existing product will return 200 Ok.
 
-        delete-composite-character:
-        description: Deletes a product character
-        notes: |
-            # Normal response
-            Entities for character stats, spells, items and  inventory
-            related to the specificed character will be deleted.
-            The implementation of the delete method is idempotent, that is, it 
-            can be called several times with the same response.
-            This means that a delete request of a non existing product will 
-            return <b>200 Ok</b>.
+server:
+  port: 7000
 
-server.port: 7000
-management.endpoint.health.show-details: "ALWAYS"
-management.endpoints.web.exposure.include: "*"
+management:
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
 app:
-    character-service:
-        host: localhost
-        port: 8083
-    spells-service:
-        host: localhost
-        port: 8082
-    items-service:
-        host: localhost
-        port: 8081
-    stats-service:
-        host: localhost
-        port: 8084
-
-    spring.cloud.stream:
-        defaultBinder: rabbit
-        default.contentType: application/json
-        bindings:
-            output-character:
-                destination: character
-                producer:
-                    required-groups: auditGroup
-            output-spells:
-                destination: spells
-                producer:
-                    required-groups: auditGroup
-            output-stats:
-                destination: stats
-                producer:
-                    required-groups: auditGroup
-            output-inventory:
-                destination: inventory
-                producer:
-                    required-groups: auditGroup
-
-    spring.cloud.stream.kafka.binder:
-        brokers: 127.0.0.1
-        defaultBrokerPort: 9092
-
-    spring.rabbitmq:
-        host: 127.0.0.1
-        port: 5672
-        username: guest
-        password: guest
-
-
+  character-service:
+    host: localhost
+    port: 8083
+  spells-service:
+    host: localhost
+    port: 8082
+  items-service:
+    host: localhost
+    port: 8081
+  stats-service:
+    host: localhost
+    port: 8084
 
 spring:
-    profiles:
+  cloud:
+    stream:
+      defaultBinder: rabbit
+      default.contentType: application/json
+      bindings:
+        output-character:
+          destination: character
+          producer:
+            required-groups: auditGroup
+        output-spells:
+          destination: spells
+          producer:
+            required-groups: auditGroup
+        output-stats:
+          destination: stats
+          producer:
+            required-groups: auditGroup
+        output-inventory:
+          destination: inventory
+          producer:
+            required-groups: auditGroup
+      kafka:
+        binder:
+          brokers: 127.0.0.1
+          defaultBrokerPort: 9092
+
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+
+  profiles:
     active: default
 ---
-
 spring:
   profiles: docker
 
-  rabbitmq.host: rabbitmq
-  cloud.stream.kafka.binder.brokers: kafka
+  rabbitmq:
+    host: rabbitmq
 
-server.port: 8080
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: kafka
 
 app:
     character-service:
-        host: localhost
-        port: 8083
+        host: character
+        port: 8080
     spells-service:
-        host: localhost
-        port: 8082
+        host: spells
+        port: 8080
     items-service:
-        host: localhost
-        port: 8081
+      host: items
+      port: 8080
     stats-service:
-        host: localhost
-        port: 8084
+      host: stats
+      port: 8080
+ 
+server:
+    port: 8080

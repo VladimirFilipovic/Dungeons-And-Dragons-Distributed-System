@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
@@ -69,6 +70,12 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
         private int statsServicePort;
         private MessageSources messageSources;
 
+        private RestTemplate restTemplate;
+
+        private String characterServiceHost;
+
+        private int characterServicePort;
+
         public interface MessageSources {
 
                 String OUTPUT_CHARACTER = "output-character";
@@ -92,6 +99,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
         @Autowired
         public IntegrationService(
                         WebClient.Builder webClientBuilder,
+                        RestTemplate restTemplate,
                         ObjectMapper objectMapper,
                         @Value("${app.character-service.host}") String characterServiceHost,
                         @Value("${app.character-service.port}") int characterServicePort,
@@ -110,7 +118,10 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
                 this.spellsServicePort = spellsServicePort;
                 this.statsServiceHost = statsServiceHost;
                 this.statsServicePort = statsServicePort;
+                this.characterServiceHost = characterServiceHost;
+                this.characterServicePort = characterServicePort;
                 this.messageSources = messageSources;
+                this.restTemplate = restTemplate;
 
                 mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
                 this.characterServiceUrl = this.getServiceUrl(characterServiceHost, characterServicePort, "characters");
@@ -423,11 +434,11 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
     }
 
     public Mono<Health> getCharacterHealth() {
-    return getHealth(characterServiceUrl);
+    return getHealth("http://" + characterServiceHost + ":" + characterServicePort);
 }
 
 public Mono<Health> getSpellHealth() {
-    return getHealth(spellsServiceUrl);
+    return getHealth("http://" + spellsServiceHost + ":" + spellsServicePort);
 }
 
 public Mono<Health> getInventoryHealth() {
@@ -435,7 +446,7 @@ public Mono<Health> getInventoryHealth() {
 }
 
 public Mono<Health> getStatsHealth() {
-    return getHealth(statsServiceUrl);
+    return getHealth("http://" + statsServiceHost + ":" + statsServicePort);
 }
 
 private Mono<Health> getHealth(String url) {
