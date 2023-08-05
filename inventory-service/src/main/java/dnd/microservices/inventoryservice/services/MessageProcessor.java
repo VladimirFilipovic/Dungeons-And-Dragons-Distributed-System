@@ -7,13 +7,19 @@ import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Sink;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+
 import dnd.microservices.core.api.character.Character;
 import dnd.microservices.core.api.character.CharacterService;
 import dnd.microservices.core.api.event.Event;
 import dnd.microservices.core.api.items.ItemCreateDto;
 import dnd.microservices.core.api.items.inventory.InventoryItemModificationDto;
 import dnd.microservices.core.utils.exceptions.EventProcessingException;
-
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @EnableBinding(Sink.class)
 public class MessageProcessor {
@@ -32,12 +38,13 @@ public class MessageProcessor {
 
     @StreamListener(target = Sink.INPUT)
     public void process(Event<String, ?> event) {
-
+        Gson gson = new Gson();
         LOG.info("Process message created at {}...", event.getEventCreatedAt());
 
         switch (event.getEventType()) {
             case CREATE:
-                ItemCreateDto item = (ItemCreateDto) event.getData();
+                            LinkedHashMap<String, Object> eventDataItemMap = (LinkedHashMap<String, Object>) event.getData();
+                ItemCreateDto item = gson.fromJson(gson.toJson(eventDataItemMap), ItemCreateDto.class);
                 LOG.info("Create item with name: {}", item.name);
                 basicItemsService.createItem(item);
                 break;
@@ -58,8 +65,11 @@ public class MessageProcessor {
                 break;
             case UPDATE_INV:
                 String characterId3 = event.getKey().toString();
-                InventoryItemModificationDto invModification = (InventoryItemModificationDto) event.getData();
-                LOG.info("Update inventory for character with id: {}",characterId3);
+                LinkedHashMap<String, Object> eventDataMap = (LinkedHashMap<String, Object>) event.getData();
+                InventoryItemModificationDto invModification = gson.fromJson(gson.toJson(eventDataMap), InventoryItemModificationDto.class);
+                 LOG.info("Update inventory for character with id: {}",characterId3);
+                 LOG.info("Inv mod", invModification);
+
                 basicInventoryService.modifyCharacterInventory(characterId3, invModification);
                 break;
             default:

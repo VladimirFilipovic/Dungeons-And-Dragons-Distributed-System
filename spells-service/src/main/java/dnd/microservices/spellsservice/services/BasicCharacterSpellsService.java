@@ -3,9 +3,11 @@ package dnd.microservices.spellsservice.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
+import dnd.microservices.core.api.dnd5e.DndSpell;
 import dnd.microservices.core.api.spells.characterSpells.CharacterSpell;
 import dnd.microservices.core.api.spells.characterSpells.CharacterSpellAssignmentDto;
 import dnd.microservices.core.api.spells.characterSpells.CharacterSpellsService;
+import dnd.microservices.core.utils.exceptions.NotFoundException;
 import dnd.microservices.spellsservice.persistance.CharacterSpellEntity;
 import dnd.microservices.spellsservice.persistance.CharacterSpellKey;
 import dnd.microservices.spellsservice.persistance.CharacterSpellRepository;
@@ -17,19 +19,32 @@ public class BasicCharacterSpellsService implements CharacterSpellsService {
 
     private CharacterSpellRepository characterSpellRepository;
     private CharacterSpellsMapper characterSpellsMapper;
+    private BasicSpellsService basicSpellsService;
 
     @Autowired
     public BasicCharacterSpellsService(CharacterSpellRepository characterSpellRepository,
-            CharacterSpellsMapper characterSpellsMapper) {
+            CharacterSpellsMapper characterSpellsMapper, BasicSpellsService basicSpellsService) {
         this.characterSpellRepository = characterSpellRepository;
         this.characterSpellsMapper = characterSpellsMapper;
+        this.basicSpellsService = basicSpellsService;
     }
 
     @Override
     public Flux<CharacterSpell> getCharacterSpells(String characterId) {
-        return this.characterSpellRepository
-                .findById_CharacterId(characterId)
-                .map(characterSpellsMapper::entityToApi);
+         return this.characterSpellRepository.findById_CharacterId(characterId)
+            .flatMap(characterSpell -> {
+                // Step 1: Fetch the DnsSpell based on the name from the web service
+                String spellName = characterSpell.id.getSpellName();
+                return this.basicSpellsService.getSpell(spellName)
+                        .map(dnsSpell -> {
+                            return new CharacterSpell(dnsSpell, characterSpell.spellLevel);
+                        })
+                        .switchIfEmpty(
+                                Mono.error(new NotFoundException("Character spell not found with characterId: " + characterId))
+                        );
+                    }
+            )
+            .switchIfEmpty(Mono.error(new NotFoundException("Character spell not found with characterId: " + characterId)));
     }
 
     @Override

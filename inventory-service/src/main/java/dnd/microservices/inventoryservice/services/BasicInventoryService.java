@@ -63,7 +63,6 @@ public class BasicInventoryService implements InventoryService {
     }
 
     @Override
-    
     public void modifyCharacterInventory(String characterId, InventoryItemModificationDto body) {
         this.characterInventoryItemEntityRepository
             .findById(new CharacterInventoryItemKey(characterId, body.itemId))

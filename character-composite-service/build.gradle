@@ -38,6 +38,7 @@ dependencies {
 	implementation('io.springfox:springfox-boot-starter:3.0.0')
 	implementation('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
 	implementation('org.springframework.cloud:spring-cloud-starter-stream-kafka')
+    implementation ('org.mongodb:mongodb-driver-sync:4.0.5') // Replace with the latest version available
 
 	testImplementation('org.springframework.cloud:spring-cloud-stream-test-support')
 	testImplementation('org.springframework.boot:spring-boot-starter-test')

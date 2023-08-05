@@ -60,10 +60,6 @@ spring:
 
   rabbitmq.host: rabbitmq
 
- 
-
-  rabbitmq.host: rabbitmq
-
   cloud.stream.kafka.binder.brokers: kafka
 
 server:

@@ -1,6 +1,5 @@
 package dnd.microservices.charactercompositeservice.services;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.LoggerFactory;
@@ -9,20 +8,23 @@ import org.springframework.web.bind.annotation.RestController;
 
 import dnd.microservices.core.api.character.Character;
 import dnd.microservices.core.api.composite.CharacterComposite;
+import dnd.microservices.core.api.composite.CharacterCompositeCreationDto;
+import dnd.microservices.core.api.composite.CharacterCompositeCreationResultDto;
 import dnd.microservices.core.api.composite.CharacterCompositeService;
 import dnd.microservices.core.api.items.inventory.InventoryItem;
+import dnd.microservices.core.api.items.inventory.InventoryItemDto;
 import dnd.microservices.core.api.items.inventory.InventoryItemModificationDto;
 import dnd.microservices.core.api.items.inventory.ModificationType;
 import dnd.microservices.core.api.spells.characterSpells.CharacterSpell;
 import dnd.microservices.core.api.spells.characterSpells.CharacterSpellAssignmentDto;
 import dnd.microservices.core.api.stats.Statistic;
-import dnd.microservices.core.api.stats.StatsAssignmentDto;
 import dnd.microservices.core.utils.http.ServiceUtil;
 import io.swagger.annotations.Api;
 import reactor.core.publisher.Mono;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Api(description = "REST API for full character information.")
 @RestController
@@ -60,6 +62,7 @@ public class BasicCharacterCompositeService implements CharacterCompositeService
             LOG.warn("getCharacterData() failed: {}", ex.toString());
         })
         .log();
+
     }
 
     private CharacterComposite createCharacterAggregate(
@@ -88,26 +91,26 @@ public class BasicCharacterCompositeService implements CharacterCompositeService
     }
 
     @Override
-    public CharacterComposite createCharacter(CharacterComposite characterComposite) {
-        Character character = new Character(characterComposite.name, characterComposite.race, characterComposite.religion);
+    public CharacterCompositeCreationResultDto createCharacter(CharacterCompositeCreationDto characterComposite) {
+        ObjectId id = new ObjectId();
+        Character character = new Character(id.toString(), characterComposite.name, characterComposite.race, characterComposite.religion, "");
         Character createdCharacter = this.integration.createCharacter(character);
-                    LOG.warn("create character: {}", createdCharacter.toString());
+        this.integration.createCharacterInventory(createdCharacter.id);
+
+        LOG.warn("create character: {}", createdCharacter.toString());
 
         if (characterComposite.items != null) {
-            this.integration.createCharacterInventory(createdCharacter.id);
-
-            List<InventoryItem> inventoryItems = characterComposite.items;
-            for (InventoryItem invItem : inventoryItems) {
-                InventoryItemModificationDto inventoryItem = new InventoryItemModificationDto(invItem.item.getId(), invItem.amount, ModificationType.ADD);
+            List<InventoryItemDto> inventoryItems = characterComposite.items;
+            for (InventoryItemDto invItem : inventoryItems) {
+                InventoryItemModificationDto inventoryItem = new InventoryItemModificationDto(invItem.id, invItem.amount, ModificationType.ADD);
                 this.integration.modifyCharacterInventory(createdCharacter.id, inventoryItem);
             }
         }
 
         if (characterComposite.spells != null) {
-            List<CharacterSpell> characterSpells = characterComposite.spells;
-            for (CharacterSpell characterSpell : characterSpells) {
-                CharacterSpellAssignmentDto spellAssignment = new CharacterSpellAssignmentDto(characterSpell.spell.name, characterSpell.level);
-                this.integration.assignSpellToCharacter(createdCharacter.id, spellAssignment);
+            List<CharacterSpellAssignmentDto> characterSpells = characterComposite.spells;
+            for (CharacterSpellAssignmentDto characterSpell : characterSpells) {
+                this.integration.assignSpellToCharacter(createdCharacter.id, characterSpell);
             }
         }
 
@@ -115,9 +118,13 @@ public class BasicCharacterCompositeService implements CharacterCompositeService
             this.integration.assignStatsToCharacter(createdCharacter.id, characterComposite.stats);
         }
 
-        characterComposite.id = createdCharacter.id;
+        return new CharacterCompositeCreationResultDto(
+            createdCharacter,
+            characterComposite.items,
+            characterComposite.spells,
+            characterComposite.stats
+        );
 
-        return characterComposite;
     }
 
 

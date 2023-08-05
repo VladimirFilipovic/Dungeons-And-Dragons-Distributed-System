@@ -28,7 +28,7 @@ public interface CharacterCompositeService {
                         @ApiResponse(code = 422, message = "Unprocessable entity, input parameters caused the processing to fail. See response message for more information.")
         })
         @PostMapping(value = "/characters", consumes = "application/json", produces = "application/json")
-        public CharacterComposite createCharacter(@RequestBody CharacterComposite characterComposite);
+        public CharacterCompositeCreationResultDto createCharacter(@RequestBody CharacterCompositeCreationDto characterComposite);
 
         @ApiOperation(value = "${api.character-composite.delete-composite-character.description}", notes = "${api.character-composite.delete-composite-character.notes}")
         @ApiResponses(value = {

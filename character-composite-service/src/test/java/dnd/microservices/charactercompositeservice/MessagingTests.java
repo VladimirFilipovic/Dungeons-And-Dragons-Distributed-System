@@ -16,6 +16,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import dnd.microservices.charactercompositeservice.services.IntegrationService;
 import dnd.microservices.core.api.composite.CharacterComposite;
+import dnd.microservices.core.api.composite.CharacterCompositeCreationDto;
+import dnd.microservices.core.api.composite.CharacterCompositeCreationResultDto;
 import dnd.microservices.core.api.dnd5e.DndAreaOfEffect;
 import dnd.microservices.core.api.dnd5e.DndDamage;
 import dnd.microservices.core.api.dnd5e.DndSpell;
@@ -23,6 +25,7 @@ import dnd.microservices.core.api.event.Event;
 import dnd.microservices.core.api.items.Item;
 import dnd.microservices.core.api.items.ItemCreateDto;
 import dnd.microservices.core.api.items.inventory.InventoryItem;
+import dnd.microservices.core.api.items.inventory.InventoryItemDto;
 import dnd.microservices.core.api.items.inventory.InventoryItemModificationDto;
 import dnd.microservices.core.api.items.inventory.ModificationType;
 import dnd.microservices.core.api.spells.characterSpells.CharacterSpell;
@@ -95,33 +98,35 @@ public class MessagingTests {
 
     @Test
     public void createCompositeCharacter() {
-        Item item = new Item(1, "testItem", "testType", "testDescription");
-        InventoryItem inventoryItem = new InventoryItem(item, 1);
-        List<InventoryItem> inventoryItems = new ArrayList<>();
-        inventoryItems.add(inventoryItem);
+      //*items */
+      Item item = new Item(1, "testItem", "testType", "testDescription");
+      InventoryItemDto inventoryItem = new InventoryItemDto(item.id, 1);
+      List<InventoryItemDto> inventoryItems = new ArrayList<>();
+      inventoryItems.add(inventoryItem);
 
-        /* spells */
-        CharacterSpell characterSpell = new CharacterSpell(dndSpell, 1);
-        List<CharacterSpell> characterSpells = new ArrayList<>();
-        characterSpells.add(characterSpell);
+      /* spells */ 
+      CharacterSpellAssignmentDto characterSpell = new CharacterSpellAssignmentDto("acid-arrow", 1);
+      List<CharacterSpellAssignmentDto> characterSpells = new ArrayList<>();
+      characterSpells.add(characterSpell);
 
-        /* stats */
-        List<Statistic> statsDto = new ArrayList<>();
-        statsDto.add(new Statistic(StatsName.HP, 10));
+     /* stats */
+     List<Statistic> statsDto = new ArrayList<>();
+     statsDto.add(new Statistic(StatsName.HP, 10));
 
-        CharacterComposite composite = new CharacterComposite(
+        CharacterCompositeCreationDto composite = new CharacterCompositeCreationDto(
                 "testCharacter3",
                 "testRace",
                 "testReligion",
+                "",
                 inventoryItems,
                 characterSpells,
                 statsDto);
 
-         composite = postAndVerifyCharacter(composite, OK);
+         CharacterCompositeCreationResultDto compositeResult = postAndVerifyCharacter(composite, OK);
 
         // Assert one create character event queued up
         assertEquals(1, queueCharacters.size());
-        Character testCharacter = new Character(composite.name, composite.race, composite.religion);
+        Character testCharacter = new Character(compositeResult.character.id, compositeResult.character.name, compositeResult.character.race, compositeResult.character.religion, "");
 
         Event<String, Character> expectedCharacterEvent = new Event<>(Event.Type.CREATE, testCharacter.name,
                 testCharacter);
@@ -132,7 +137,7 @@ public class MessagingTests {
         queueInventory.remove();
         InventoryItemModificationDto inventoryItemModificationDto = new InventoryItemModificationDto(item.id, 1,
                 ModificationType.ADD);
-        Event<String, InventoryItemModificationDto> expectedInventoryEvent = new Event<>(Event.Type.UPDATE_INV, composite.id,
+        Event<String, InventoryItemModificationDto> expectedInventoryEvent = new Event<>(Event.Type.UPDATE_INV, compositeResult.character.id,
                 inventoryItemModificationDto);
      
 
@@ -141,15 +146,15 @@ public class MessagingTests {
 
         // Assert one create spell event queued up
         assertEquals(1, queueSpells.size());
-        CharacterSpellAssignmentDto spellAssignment = new CharacterSpellAssignmentDto(characterSpell.spell.name, characterSpell.level);
+        CharacterSpellAssignmentDto spellAssignment = new CharacterSpellAssignmentDto(characterSpell.spellName, characterSpell.spellLevel);
 
-        Event<String, CharacterSpellAssignmentDto> expectedSpellEvent = new Event<>(Event.Type.CREATE, composite.id,spellAssignment);
+        Event<String, CharacterSpellAssignmentDto> expectedSpellEvent = new Event<>(Event.Type.CREATE, compositeResult.character.id ,spellAssignment);
         assertThat(queueSpells, is(receivesPayloadThat(sameEventExceptCreatedAt(expectedSpellEvent))));
 
         // Assert one create stats event queued up
         assertEquals(1, queueStats.size());
 
-        Event<String, List<Statistic>> expectedStatsEvent = new Event<>(Event.Type.UPDATE, composite.id, composite.stats);
+        Event<String, List<Statistic>> expectedStatsEvent = new Event<>(Event.Type.UPDATE, compositeResult.character.id, composite.stats);
         assertThat(queueStats, is(receivesPayloadThat(sameEventExceptCreatedAt(expectedStatsEvent))));
     }
 
@@ -170,7 +175,7 @@ public class MessagingTests {
 
         assertEquals(1, queueSpells.size());
 
-        Event<String, CharacterSpellAssignmentDto> expectedSpellEvent = new Event<>(Event.Type.DELETE, CHARACTER_ID_OK, null);
+        Event<String, CharacterSpellAssignmentDto> expectedSpellEvent = new Event<>(Event.Type.DELETE_SPELL_REC, CHARACTER_ID_OK, null);
         assertThat(queueSpells, is(receivesPayloadThat(sameEventExceptCreatedAt(expectedSpellEvent))));
 
         assertEquals(1, queueStats.size());
@@ -183,14 +188,14 @@ public class MessagingTests {
         return collector.forChannel(messageChannel);
     }
 
-    private CharacterComposite postAndVerifyCharacter(CharacterComposite compositeCharacter,
+    private CharacterCompositeCreationResultDto postAndVerifyCharacter(CharacterCompositeCreationDto compositeCharacter,
             HttpStatus expectedStatus) {
         return client.post()
                 .uri("/characters")
-                .body(just(compositeCharacter), CharacterComposite.class)
+                .body(just(compositeCharacter), CharacterCompositeCreationDto.class)
                 .exchange()
                 .expectStatus().isEqualTo(expectedStatus)
-                .returnResult(CharacterComposite.class)
+                .returnResult(CharacterCompositeCreationResultDto.class)
                 .getResponseBody()
                 .blockLast();
     }

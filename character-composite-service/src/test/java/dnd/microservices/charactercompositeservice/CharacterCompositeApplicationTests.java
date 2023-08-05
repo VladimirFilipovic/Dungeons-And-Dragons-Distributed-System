@@ -19,11 +19,15 @@ import dnd.microservices.charactercompositeservice.services.BasicCharacterCompos
 import dnd.microservices.charactercompositeservice.services.IntegrationService;
 import dnd.microservices.core.api.character.Character;
 import dnd.microservices.core.api.composite.CharacterComposite;
+import dnd.microservices.core.api.composite.CharacterCompositeCreationDto;
+import dnd.microservices.core.api.composite.CharacterCompositeCreationResultDto;
 import dnd.microservices.core.api.dnd5e.DndSpell;
 import dnd.microservices.core.api.items.Item;
 import dnd.microservices.core.api.items.ItemCreateDto;
 import dnd.microservices.core.api.items.inventory.InventoryItem;
+import dnd.microservices.core.api.items.inventory.InventoryItemDto;
 import dnd.microservices.core.api.spells.characterSpells.CharacterSpell;
+import dnd.microservices.core.api.spells.characterSpells.CharacterSpellAssignmentDto;
 import dnd.microservices.core.api.stats.Statistic;
 import dnd.microservices.core.api.stats.StatsName;
 
@@ -98,33 +102,34 @@ public class CharacterCompositeApplicationTests {
       //*items */
       itemCreateDto = new ItemCreateDto("testItem");
       Item item = integrationService.createItem(itemCreateDto);
-      InventoryItem inventoryItem = new InventoryItem(item, 1);
-      List<InventoryItem> inventoryItems = new ArrayList<>();
+      InventoryItemDto inventoryItem = new InventoryItemDto(item.id, 1);
+      List<InventoryItemDto> inventoryItems = new ArrayList<>();
       inventoryItems.add(inventoryItem);
 
       /* spells */ 
       DndSpell spell = integrationService.getSpell("acid-arrow").block();
-      CharacterSpell characterSpell = new CharacterSpell(spell, 1);
-      List<CharacterSpell> characterSpells = new ArrayList<>();
+      CharacterSpellAssignmentDto characterSpell = new CharacterSpellAssignmentDto("acid-arrow", 1);
+      List<CharacterSpellAssignmentDto> characterSpells = new ArrayList<>();
       characterSpells.add(characterSpell);
 
       statsDto = new ArrayList<>();
       statsDto.add(new Statistic(StatsName.HP, 10));
       statsDto.add(new Statistic(StatsName.AC, 10));
 
-       characterComposite = new CharacterComposite(
+      CharacterCompositeCreationDto characterCompositeCreation = new CharacterCompositeCreationDto(
           "testCharacter3",
           "testRace",
           "testReligion",
+          "",
           inventoryItems,
           characterSpells,
           statsDto
       );
 
-      CharacterComposite composite = basicCharacterCompositeService.createCharacter(characterComposite);
+      CharacterCompositeCreationResultDto  composite = basicCharacterCompositeService.createCharacter(characterCompositeCreation);
       assertNotNull(composite);
 
-      characterComposite = basicCharacterCompositeService.getCharacterData(composite.id).block();
+      characterComposite = basicCharacterCompositeService.getCharacterData(composite.character.id).block();
       assertNotNull(characterComposite);
       assertEquals(characterComposite.name, "testCharacter3");
       assertNotNull(characterComposite.items);

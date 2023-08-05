@@ -21,6 +21,15 @@ public class CharacterEntity {
     public String religion;
     public String serviceAddress;
 
+    public CharacterEntity(String id, int version, String name, String race, String religion, String serviceAddress) {
+        this.id = id;
+        this.version = version;
+        this.name = name;
+        this.race = race;
+        this.religion = religion;
+        this.serviceAddress = serviceAddress;
+    }
+
     public String getId() {
         return id;
     }

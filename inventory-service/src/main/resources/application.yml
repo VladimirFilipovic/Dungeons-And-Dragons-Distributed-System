@@ -14,8 +14,8 @@ spring:
     defaultBinder: rabbit
     default.contentType: application/json
     bindings.input:
-      destination: stats
-      group: statsGroup
+      destination: inventory
+      group: inventoryGroup
 
   cloud.stream.bindings.input.consumer:
     maxAttempts: 3

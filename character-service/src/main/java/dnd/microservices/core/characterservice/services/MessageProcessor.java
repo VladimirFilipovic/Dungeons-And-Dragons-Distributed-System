@@ -25,7 +25,7 @@ public class MessageProcessor {
     }
 
     @StreamListener(target = Sink.INPUT)
-    public void process(Event<Integer, Character> event) {
+    public void process(Event<String, Character> event) {
 
         LOG.info("Process message created at {}...", event.getEventCreatedAt());
 
@@ -38,7 +38,7 @@ public class MessageProcessor {
             break;
 
         case DELETE:
-            String characterId = event.getKey().toString();
+            String characterId = event.getKey();
             LOG.info("Delete character with ID: {}", characterId);
             characterService.deleteCharacter(characterId);
             break;

@@ -1,5 +1,6 @@
 package dnd.microservices.statsservice.services;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -8,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Sink;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.*;
 
 import dnd.microservices.core.api.event.Event;
 import dnd.microservices.core.api.stats.Statistic;
@@ -27,14 +31,18 @@ public class MessageProcessor {
 
     @StreamListener(target = Sink.INPUT)
     public void process(Event<String, ?> event) {
-
+        Gson gson = new Gson();
         LOG.info("Process message created at {}...", event.getEventCreatedAt());
 
         switch (event.getEventType()) {
 
-            case CREATE:
+            case UPDATE:
                 String characterId = event.getKey();
-                List<Statistic> statistic = (List<Statistic>) event.getData();
+                String eventDataJson = gson.toJson(event.getData()); // Convert LinkedHashMap to JSON string
+
+                // Use TypeToken to specify the list's type
+                Type statisticListType = new TypeToken<List<Statistic>>() {}.getType();
+                List<Statistic> statistic = gson.fromJson(eventDataJson, statisticListType); // Deserialize JSON string to List<Statistic>
                 LOG.info("Assign stats to character with ID: {}", characterId);
                 statsService.assignStatsToCharacter(characterId, statistic);
                 break;

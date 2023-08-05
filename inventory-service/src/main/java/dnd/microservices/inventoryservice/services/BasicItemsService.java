@@ -67,7 +67,6 @@ public class BasicItemsService implements ItemsService {
         ItemEntity itemEntity = itemRepository.findByName(itemName)
           .orElseThrow(() -> new NotFoundException("No item found for name: " + itemName));
 
-           
         Item item = itemMapper.entityToApi(itemEntity);
         item.setServiceAddress(serviceUtil.getServiceAddress());
         
