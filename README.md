@@ -32,3 +32,7 @@ Then you can run the tests with the following script: e2e-tests.bash
 
 
 Swagger location: http://localhost:8080/swagger-ui/index.html
+
+You need jq installed on your machine in order to run the e2e tests
+To do so run the following command: sudo apt-get install jq or for win machines: 
+curl -L -o /usr/bin/jq.exe https://github.com/stedolan/jq/releases/latest/download/jq-win64.exe

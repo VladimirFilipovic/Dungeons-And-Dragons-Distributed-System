@@ -43,7 +43,7 @@ public class MessageProcessor {
 
         switch (event.getEventType()) {
             case CREATE:
-                            LinkedHashMap<String, Object> eventDataItemMap = (LinkedHashMap<String, Object>) event.getData();
+                LinkedHashMap<String, Object> eventDataItemMap = (LinkedHashMap<String, Object>) event.getData();
                 ItemCreateDto item = gson.fromJson(gson.toJson(eventDataItemMap), ItemCreateDto.class);
                 LOG.info("Create item with name: {}", item.name);
                 basicItemsService.createItem(item);
