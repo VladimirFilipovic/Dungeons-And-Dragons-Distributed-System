@@ -9,9 +9,12 @@ import org.springframework.boot.actuate.health.HealthAggregator;
 import org.springframework.boot.actuate.health.ReactiveHealthIndicator;
 import org.springframework.boot.actuate.health.ReactiveHealthIndicatorRegistry;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import dnd.microservices.charactercompositeservice.services.IntegrationService;
 import springfox.documentation.builders.PathSelectors;
@@ -30,6 +33,7 @@ import java.util.LinkedHashMap;
 @SpringBootApplication
 @ComponentScan("dnd.microservices")
 @EnableSwagger2
+@EnableEurekaClient 
 public class CharacterCompositeServiceApplication {
 
 	@Value("${api.common.version}")
@@ -74,6 +78,13 @@ public class CharacterCompositeServiceApplication {
 	@Bean
 	RestTemplate restTemplate() {
 		return new RestTemplate();
+	}
+
+	@Bean
+	@LoadBalanced
+	public WebClient.Builder loadBalancedWebClientBuilder() {
+		final WebClient.Builder builder = WebClient.builder();
+		return builder;
 	}
 
 	@Autowired

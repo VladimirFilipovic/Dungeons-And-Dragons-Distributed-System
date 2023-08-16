@@ -86,11 +86,12 @@ function testCompositeCreated() {
 
     #create item
     itemBody='{
-    "name": "spear",
-    "description": "pointy"
+    "name": "Magic-Staff",
+    "description": "A powerful staff"
     }'
     item=$(curl -X POST http://$HOST:$ITEM_PORT/items  -H "Content-Type: application/json" --data "$itemBody")
     itemId=$(echo "$item" | jq -r .id)
+    itemName=$(echo "$item" | jq -r .name)
 
     echo "Item: $item"
     echo "Item ID: $itemId"
@@ -154,7 +155,7 @@ function testCompositeCreated() {
 
     #delete character and item
     assertCurl 200 "curl -X DELETE http://$HOST:$PORT/characters/$characterId -s"
-    assertCurl 200 "curl -X DELETE http://$HOST:$ITEM_PORT/items/spear -s"
+    assertCurl 200 "curl -X DELETE http://$HOST:$ITEM_PORT/items/$itemName -s"
 
     set -e
 }

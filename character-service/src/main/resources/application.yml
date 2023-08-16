@@ -8,7 +8,21 @@ secure-port-enabled: false
 non-secure-port: 80
 secure-port: 443
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    initialInstanceInfoReplicationIntervalSeconds: 5
+    registryFetchIntervalSeconds: 5
+  instance:
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
+
 spring:
+
+  application:
+    name: api-characters
+  
   data:
     mongodb:
       host: localhost
@@ -70,3 +84,8 @@ spring:
 
 server:
   port: 8080
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone:  http://eureka:8761/eureka/

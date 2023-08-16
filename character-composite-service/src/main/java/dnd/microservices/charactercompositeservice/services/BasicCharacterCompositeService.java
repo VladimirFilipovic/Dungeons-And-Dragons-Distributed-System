@@ -34,6 +34,8 @@ public class BasicCharacterCompositeService implements CharacterCompositeService
     private  IntegrationService integration;
     private static final Logger LOG = LoggerFactory.getLogger(BasicCharacterCompositeService.class);
 
+    
+
     @Autowired
     public BasicCharacterCompositeService(
             ServiceUtil serviceUtil,

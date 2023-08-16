@@ -1,7 +1,21 @@
 server.port: 7004
 management.endpoint.health.show-details: "ALWAYS"
 management.endpoints.web.exposure.include: "*" 
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    initialInstanceInfoReplicationIntervalSeconds: 5
+    registryFetchIntervalSeconds: 5
+  instance:
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
+
 spring:
+  application:
+    name: api-stats
+
   data:
     mongodb:
       host: localhost
@@ -67,3 +81,8 @@ server:
 management.endpoint.health.show-details: "ALWAYS"
 management.endpoints.web.exposure.include: "*" 
 
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka:8761/eureka/

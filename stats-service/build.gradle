@@ -38,6 +38,8 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
 	
 	implementation("org.mapstruct:mapstruct:${mapstructVersion}")
+			implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:3.0.5')
+
 
 	compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"

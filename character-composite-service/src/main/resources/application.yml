@@ -61,6 +61,21 @@ app:
     host: localhost
     port: 8084
 
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    initialInstanceInfoReplicationIntervalSeconds: 5
+    registryFetchIntervalSeconds: 5
+  instance:
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
+
+ribbon.ServerListRefreshInterval: 5000
+
+ribbon.NFLoadBalancerPingInterval: 5
+
 spring:
   cloud:
     stream:
@@ -94,8 +109,10 @@ spring:
     username: guest
     password: guest
 
+
   profiles:
     active: default
+
 ---
 spring:
   profiles: docker
@@ -108,6 +125,9 @@ spring:
       kafka:
         binder:
           brokers: kafka
+  application:
+    name: character-composite
+
 
 app:
     character-service:
@@ -125,3 +145,8 @@ app:
  
 server:
     port: 8080
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka:8761/eureka/

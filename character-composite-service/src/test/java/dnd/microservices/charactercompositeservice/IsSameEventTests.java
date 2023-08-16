@@ -7,11 +7,13 @@ import dnd.microservices.core.api.event.Event;
 import static dnd.microservices.charactercompositeservice.IsSameEvent.sameEventExceptCreatedAt;
 
 import org.junit.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
+@SpringBootTest(properties ={"eureka.client.enabled=false"})
 public class IsSameEventTests {
 
 	ObjectMapper mapper = new ObjectMapper();

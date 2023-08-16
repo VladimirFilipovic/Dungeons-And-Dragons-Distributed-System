@@ -54,23 +54,22 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
 
         private static final Logger LOG = LoggerFactory.getLogger(IntegrationService.class);
 
-        private final WebClient webClient;
+        private final  WebClient.Builder webClientBuilder;
         private final ObjectMapper mapper;
 
         private final String characterServiceUrl;
-        private final String itemsServiceUrl;
+        private final String inventoryServiceUrl;
         private final String spellsServiceUrl;
         private final String statsServiceUrl;
 
-        private String itemsServiceHost;
-        private int itemsServicePort;
+        private String inventoryServiceHost;
         private String spellsServiceHost;
-        private int spellsServicePort;
         private String statsServiceHost;
-        private int statsServicePort;
         private MessageSources messageSources;
 
         private RestTemplate restTemplate;
+
+        private  WebClient webClient;
 
         private String characterServiceHost;
 
@@ -101,33 +100,21 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
                         WebClient.Builder webClientBuilder,
                         RestTemplate restTemplate,
                         ObjectMapper objectMapper,
-                        @Value("${app.character-service.host}") String characterServiceHost,
-                        @Value("${app.character-service.port}") int characterServicePort,
-                        @Value("${app.items-service.host}") String itemsServiceHost,
-                        @Value("${app.items-service.port}") int itemsServicePort,
-                        @Value("${app.spells-service.host}") String spellsServiceHost,
-                        @Value("${app.spells-service.port}") int spellsServicePort,
-                        @Value("${app.stats-service.host}") String statsServiceHost,
-                        @Value("${app.stats-service.port}") int statsServicePort,
                         MessageSources messageSources) {
-                this.webClient = webClientBuilder.build();
+                this.webClientBuilder = webClientBuilder;
                 this.mapper = objectMapper;
-                this.itemsServiceHost = itemsServiceHost;
-                this.itemsServicePort = itemsServicePort;
-                this.spellsServiceHost = spellsServiceHost;
-                this.spellsServicePort = spellsServicePort;
-                this.statsServiceHost = statsServiceHost;
-                this.statsServicePort = statsServicePort;
-                this.characterServiceHost = characterServiceHost;
-                this.characterServicePort = characterServicePort;
                 this.messageSources = messageSources;
                 this.restTemplate = restTemplate;
 
                 mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-                this.characterServiceUrl = this.getServiceUrl(characterServiceHost, characterServicePort, "characters");
-                this.itemsServiceUrl = this.getServiceUrl(itemsServiceHost, itemsServicePort, "items");
-                this.spellsServiceUrl = this.getServiceUrl(spellsServiceHost, spellsServicePort, "spells");
-                this.statsServiceUrl = this.getServiceUrl(statsServiceHost, statsServicePort, "characters");
+                this.characterServiceUrl = "http://api-characters/characters";
+                this.inventoryServiceUrl = "http://api-inventory";
+                this.spellsServiceUrl = "http://api-spells";
+                this.statsServiceUrl = "http://api-stats";
+                this.statsServiceHost = "api-stats";
+                this.spellsServiceHost = "api-spells";
+                this.inventoryServiceHost = "api-inventory";
+                this.characterServiceHost = "api-characters";
         }
 
         // #region character
@@ -141,7 +128,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
                 String requestUrl = characterServiceUrl + "/" + characterName;
                 LOG.debug("Will call Character API on URL: {}", requestUrl);
 
-                return webClient.get()
+                return getWebClient().get()
                                 .uri(requestUrl)
                                 .retrieve()
                                 .bodyToMono(Character.class)
@@ -181,8 +168,8 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
 
         @Override
         public Flux<Item> getItems() {
-                return webClient.get()
-                                .uri(itemsServiceUrl)
+                return getWebClient().get()
+                                .uri(inventoryServiceUrl + "/items")
                                 .retrieve()
                                 .bodyToFlux(Item.class)
                                 .doOnNext(item -> LOG.debug("Retrieved item: {}", item.getName()))
@@ -191,8 +178,8 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
 
         @Override
         public Mono<Item> getItem(String itemName) {
-                String requestUrl = itemsServiceUrl + "/" + itemName;
-                return webClient.get()
+                String requestUrl = inventoryServiceUrl + "/items/" + itemName;
+                return getWebClient().get()
                                 .uri(requestUrl)
                                 .retrieve()
                                 .bodyToMono(Item.class)
@@ -202,7 +189,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
 
         @Override
         public Item createItem(ItemCreateDto body) {
-                String requestUrl = itemsServiceUrl;
+                String requestUrl = inventoryServiceUrl;
                 LOG.debug("Will call Item API on URL: {}", requestUrl);
 
                 Event event = new Event(Event.Type.CREATE, body.name, body);
@@ -220,7 +207,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
 
         @Override
         public void deleteItem(String itemName) {
-                String requestUrl = itemsServiceUrl + "/" + itemName;
+                String requestUrl = inventoryServiceUrl + "/" + itemName;
                 LOG.debug("Will call Item API on URL: {}", requestUrl);
 
                 Event<String, Void> event = new Event<>(Event.Type.DELETE, itemName, null);
@@ -233,9 +220,9 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
 
         @Override
         public Flux<InventoryItem> getCharacterInventory(String characterId) {
-                String requestUrl = "http://" + itemsServiceHost + ":" + itemsServicePort + "/characters/" + characterId
+                String requestUrl = "http://" + inventoryServiceHost + "/characters/" + characterId
                                 + "/inventory";
-                return WebClient.create()
+                return getWebClient()
                                 .get()
                                 .uri(requestUrl)
                                 .retrieve()
@@ -247,7 +234,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
 
         @Override
         public void modifyCharacterInventory(String characterId, InventoryItemModificationDto body) {
-                String requestUrl = "http://" + itemsServiceHost + ":" + itemsServicePort + "/characters/" + characterId
+                String requestUrl = "http://" + inventoryServiceHost + "/characters/" + characterId
                                 + "/inventory";
                 LOG.debug("Will call Item API on URL: {}", requestUrl);
 
@@ -265,7 +252,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
 
         @Override
         public void createCharacterInventory(String characterId) {
-                String requestUrl = "http://" + itemsServiceHost + ":" + itemsServicePort + "/characters/" + characterId
+                String requestUrl = "http://" + inventoryServiceHost + "/characters/" + characterId
                                 + "/inventory";
                 LOG.debug("Will call Item API on URL: {}", requestUrl);
 
@@ -280,7 +267,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
 
         @Override
         public void deleteCharacterInventory(String characterId) {
-                String requestUrl = "http://" + itemsServiceHost + ":" + itemsServicePort + "/characters/" + characterId
+                String requestUrl = "http://" + inventoryServiceHost + "/characters/" + characterId
                                 + "/inventory";
                 LOG.debug("Will call Item API on URL: {}", requestUrl);
 
@@ -297,8 +284,8 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
         // #region spells service
         @Override
         public Mono<DndSpell> getSpell(String spellName) {
-                String requestUrl = spellsServiceUrl + "/" + spellName;
-                return WebClient.create()
+                String requestUrl = spellsServiceUrl + "/spells/" + spellName;
+                return getWebClient()
                                 .get()
                                 .uri(requestUrl)
                                 .retrieve()
@@ -309,10 +296,10 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
 
         @Override
         public Flux<CharacterSpell> getCharacterSpells(String characterId) {
-                String requestUrl = "http://" + spellsServiceHost + ":" + spellsServicePort + "/characters/"
+                String requestUrl = "http://" + spellsServiceHost+ "/characters/"
                                 + characterId
                                 + "/spells";
-                return WebClient.create()
+                return getWebClient()
                                 .get()
                                 .uri(requestUrl)
                                 .retrieve()
@@ -325,7 +312,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
 
         @Override
         public void assignSpellToCharacter(String characterId, CharacterSpellAssignmentDto body) {
-                String requestUrl = "http://" + spellsServiceHost + ":" + spellsServicePort + "/characters/"
+                String requestUrl = "http://" + spellsServiceHost+ "/characters/"
                                 + characterId + "/spells";
                 LOG.debug("Will call Spell API on URL: {}", requestUrl);
 
@@ -342,7 +329,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
 
         @Override
         public void removeSpellFromCharacter(String characterId, String spellName) {
-                String requestUrl = "http://" + spellsServiceHost + ":" + spellsServicePort + "/characters/"
+                String requestUrl = "http://" + spellsServiceHost+ "/characters/"
                                 + characterId + "/spells/" + spellName;
                 LOG.debug("Will call Spell API on URL: {}", requestUrl);
 
@@ -359,7 +346,7 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
 
         @Override
         public void deleteCharacterSpellRecords(String characterId) {
-                String requestUrl = "http://" + spellsServiceHost + ":" + spellsServicePort + "/characters/"
+                String requestUrl = "http://" + spellsServiceHost+ "/characters/"
                                 + characterId + "/spells";
                 LOG.debug("Will call Spell API on URL: {}", requestUrl);
 
@@ -378,8 +365,8 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
 
         // #region stats service
         public Flux<Statistic> getStats(String characterId) {
-                String requestUrl = statsServiceUrl + "/" + characterId + "/stats";
-                return WebClient.create()
+                String requestUrl = statsServiceUrl + "/characters/" + characterId + "/stats";
+                return getWebClient()
                                 .get()
                                 .uri(requestUrl)
                                 .retrieve()
@@ -391,8 +378,8 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
 
         @Override
         public Flux<Statistic> getStats(String characterId, String statName) {
-                String requestUrl = statsServiceUrl + "/" + characterId + "/stats?statName=" + statName;
-                return WebClient.create()
+                String requestUrl = statsServiceUrl + "/characters/" + characterId + "/stats?statName=" + statName;
+                return getWebClient()
                                 .get()
                                 .uri(requestUrl)
                                 .retrieve()
@@ -401,67 +388,74 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
                                 .onErrorResume(error -> empty());
         }
 
-          @Override
-    public void assignStatsToCharacter(String characterId, List<Statistic> body) {
-        String requestUrl = statsServiceUrl + "/" + characterId + "/stats";
-        LOG.debug("Will call Stats API on URL: {}", requestUrl);
+        @Override
+        public void assignStatsToCharacter(String characterId, List<Statistic> body) {
+                String requestUrl = statsServiceUrl + "/" + characterId + "/stats";
+                LOG.debug("Will call Stats API on URL: {}", requestUrl);
 
-        Event event = new Event<>(Event.Type.UPDATE, characterId, body);
-        Message<Event> message = MessageBuilder
-                .withPayload(event)
-                .build();
+                Event event = new Event<>(Event.Type.UPDATE, characterId, body);
+                Message<Event> message = MessageBuilder
+                                .withPayload(event)
+                                .build();
 
-        messageSources.outputStats().send(message);
+                messageSources.outputStats().send(message);
 
-        // Perform any other necessary operations
-        // ...
-    }
+                // Perform any other necessary operations
+                // ...
+        }
 
-    @Override
-    public void deleteCharacterStats(String characterId) {
-        String requestUrl = statsServiceUrl + "/" + characterId + "/stats";
-        LOG.debug("Will call Stats API on URL: {}", requestUrl);
+        @Override
+        public void deleteCharacterStats(String characterId) {
+                String requestUrl = statsServiceUrl + "/" + characterId + "/stats";
+                LOG.debug("Will call Stats API on URL: {}", requestUrl);
 
-        Event<String, Void> event = new Event<>(Event.Type.DELETE, characterId, null);
-        Message<Event<String, Void>> message = MessageBuilder
-                .withPayload(event)
-                .build();
+                Event<String, Void> event = new Event<>(Event.Type.DELETE, characterId, null);
+                Message<Event<String, Void>> message = MessageBuilder
+                                .withPayload(event)
+                                .build();
 
-        messageSources.outputStats().send(message);
+                messageSources.outputStats().send(message);
 
-        // Perform any other necessary operations
-        // ...
-    }
+                // Perform any other necessary operations
+                // ...
+        }
 
-    public Mono<Health> getCharacterHealth() {
-    return getHealth("http://" + characterServiceHost + ":" + characterServicePort);
-}
+        public Mono<Health> getCharacterHealth() {
+                return getHealth("http://" + characterServiceHost + ":" + characterServicePort);
+        }
 
-public Mono<Health> getSpellHealth() {
-    return getHealth("http://" + spellsServiceHost + ":" + spellsServicePort);
-}
+        public Mono<Health> getSpellHealth() {
+                return getHealth("http://" + spellsServiceHost);
+        }
 
-public Mono<Health> getInventoryHealth() {
-    return getHealth("http://" + itemsServiceHost + ":" + itemsServicePort);
-}
+        public Mono<Health> getInventoryHealth() {
+                return getHealth("http://" + inventoryServiceHost);
+        }
 
-public Mono<Health> getStatsHealth() {
-    return getHealth("http://" + statsServiceHost + ":" + statsServicePort);
-}
+        public Mono<Health> getStatsHealth() {
+                return getHealth("http://" + statsServiceHost);
+        }
 
-private Mono<Health> getHealth(String url) {
-    url += "/actuator/health";
-    LOG.debug("Will call the Health API on URL: {}", url);
-    return webClient.get().uri(url).retrieve().bodyToMono(String.class)
-            .map(s -> new Health.Builder().up().build())
-            .onErrorResume(ex -> Mono.just(new Health.Builder().down(ex).build()))
-            .log();
-}
+        private Mono<Health> getHealth(String url) {
+                url += "/actuator/health";
+                LOG.debug("Will call the Health API on URL: {}", url);
+                return getWebClient().get().uri(url).retrieve().bodyToMono(String.class)
+                                .map(s -> new Health.Builder().up().build())
+                                .onErrorResume(ex -> Mono.just(new Health.Builder().down(ex).build()))
+                                .log();
+        }
 
         // #endregion
 
         private String getServiceUrl(String host, int port, String serviceName) {
                 return "http://" + host + ":" + port + "/" + serviceName;
+        }
+
+        private WebClient getWebClient() {
+                if (webClient == null) {
+                        webClient = webClientBuilder.build();
+                }
+                return webClient;
         }
 
         private Throwable handleError(Throwable ex) {
