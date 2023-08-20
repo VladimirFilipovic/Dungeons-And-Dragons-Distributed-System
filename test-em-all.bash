@@ -11,7 +11,6 @@
 : ${HOST=localhost}
 : ${PORT=8080}
 : ${CHAR_ID=0}
-: ${ITEM_PORT=8081}
 
 function assertCurl() {
 
@@ -86,10 +85,10 @@ function testCompositeCreated() {
 
     #create item
     itemBody='{
-    "name": "Magic-Staff",
+    "name": "Magic-Staffs",
     "description": "A powerful staff"
     }'
-    item=$(curl -X POST http://$HOST:$ITEM_PORT/items  -H "Content-Type: application/json" --data "$itemBody")
+    item=$(curl -X POST http://$HOST:$PORT/items  -H "Content-Type: application/json" --data "$itemBody")
     itemId=$(echo "$item" | jq -r .id)
     itemName=$(echo "$item" | jq -r .name)
 
@@ -122,7 +121,7 @@ function testCompositeCreated() {
     }'
 
     #create character   
-    character=$(curl -X POST http://$HOST:$PORT/characters -H "Content-Type: application/json" --data "$body")
+    character=$(curl -X POST http://$HOST:$PORT/characters/ -H "Content-Type: application/json" --data "$body")
 
     echo "Character: $character"
 
@@ -155,7 +154,7 @@ function testCompositeCreated() {
 
     #delete character and item
     assertCurl 200 "curl -X DELETE http://$HOST:$PORT/characters/$characterId -s"
-    assertCurl 200 "curl -X DELETE http://$HOST:$ITEM_PORT/items/$itemName -s"
+    assertCurl 200 "curl -X DELETE http://$HOST:$PORT/items/$itemName -s"
 
     set -e
 }

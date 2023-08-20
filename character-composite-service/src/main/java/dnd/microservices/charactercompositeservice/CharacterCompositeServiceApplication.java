@@ -92,20 +92,6 @@ public class CharacterCompositeServiceApplication {
 
 	@Autowired
 	IntegrationService integration;
-
-	@Bean
-	ReactiveHealthIndicator coreServices() {
-
-		ReactiveHealthIndicatorRegistry registry = new DefaultReactiveHealthIndicatorRegistry(new LinkedHashMap<>());
-
-		registry.register("character", () -> integration.getCharacterHealth());
-		registry.register("spell", () -> integration.getSpellHealth());
-		registry.register("inventory", () -> integration.getInventoryHealth());
-		registry.register("stats", () -> integration.getStatsHealth());
-
-		return new CompositeReactiveHealthIndicator(healthAggregator, registry);
-	}
-
 	public static void main(String[] args) {
 		SpringApplication.run(CharacterCompositeServiceApplication.class, args);
 	}
