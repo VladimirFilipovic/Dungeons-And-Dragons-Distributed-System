@@ -3,15 +3,10 @@ A dungeons and dragons microservice-based api
 
 Hopefuly it will make our beloved DM's job easier
 
-spring_cloud_distributed_systems is a information system developed using `Spring Cloud`. It represents a set of cooperating microservices with minimalistic functionality. Essentially, it provides a RESTful API exposed by a composite microservice. The composite microservice calls four other microservices to create an aggregated response. The following is a diagram of the microservices landscape.
-
-![](diagrams/microservices-landscape.png "Microservices landscape diagram")
+spring_cloud_distributed_systems is a information system developed using `Spring Cloud`. It represents a set of cooperating microservices with minimalistic functionality. Essentially, it provides a RESTful API exposed by a composite microservice. The composite microservice calls four other microservices to create an aggregated response. 
 
 Microservice-based system landscape consists of four core microservices, the `character`, `spells`, `stats` and `inventory` services, all of which deal with one type of resource, and a composite microservice called `character-composite` service, which aggregates information from the core services. 
  
- The following is a class diagram of DTO classes.
- 
- ![](diagrams/class-diagram.png "Class diagram")
  
  With `Spring Cloud`, the following microservices design patterns are implemented:
  
@@ -22,9 +17,9 @@ Microservice-based system landscape consists of four core microservices, the `ch
 | 3 | [Reactive microservices](#reactive-microservices) | Spring Web Flux framework, RabbitMQ, Kafka |
 | 4 | [Circuit breaker](#circuit-breaker) | Resilience4j   | 
 
-The following is a diagram of the system landscape.
+<!-- The following is a diagram of the system landscape.
 
- ![](diagrams/system-landscape.png "System landscape diagram")
+ ![](diagrams/system-landscape.png "System landscape diagram") -->
 
 ### Service Discovery
 Considering the DNS-based service discovery is not well-suited for handling volatile microservices instances, `Netflix Eureka` is used to provide a robust, resilient and fault-tolerant solution. 
@@ -95,8 +90,8 @@ Each microservice has its own database, `character`, `lecture`, and `author` are
 Starting containers can be done with following script: start-em-all.bash
 
 In order to run e2e tests you need to have docker installed and running on your machine
-First step is to run all container with the following script: ./start-em-all.bash
-Then you can run the tests with the following script: .test-em-all.bash
+First step is to run all container with the following script: *./start-em-all.bash*
+Then you can run the tests with the following script: *.test-em-all.bash*
 
 
 Swagger location: http://localhost:8080/swagger-ui/index.html
