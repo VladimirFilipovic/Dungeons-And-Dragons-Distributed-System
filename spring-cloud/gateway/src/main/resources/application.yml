@@ -1,13 +1,25 @@
-server.port: 8080
+server.port: 8443
 
 spring.application.name: gateway
 
-app.eureka-server: localhost
+server.ssl:
+  key-store-type: PKCS12
+  key-store: classpath:keystore/edge.p12
+  key-store-password: password
+  key-alias: localhost
+
+app:
+  eureka-username: u
+  eureka-password: p
+  eureka-server: localhost
+  auth-server: localhost
+
+
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://${app.eureka-server}:8761/eureka/
+      defaultZone: "http://${app.eureka-username}:${app.eureka-password}@${app.eureka-server}:8761/eureka/"
     initialInstanceInfoReplicationIntervalSeconds: 5
     registryFetchIntervalSeconds: 5
   instance:
@@ -18,7 +30,15 @@ ribbon.ServerListRefreshInterval: 5000
 
 ribbon.NFLoadBalancerPingInterval: 5
 
+spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://${app.auth-server}:9999/.well-known/jwks.json
+
 spring.cloud.gateway.routes:
+
+
+- id: oauth-server
+  uri: lb://auth-server
+  predicates:
+  - Path=/oauth/**
 
 - id: cahracter-items
   uri: lb://api-inventory
@@ -109,7 +129,23 @@ logging:
     org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator: INFO
     org.springframework.cloud.gateway: TRACE
 
+profiles:
+    active: default
 ---
 spring.profiles: docker
 
-app.eureka-server: eureka
+app:
+    character-service:
+        host: character
+        port: 8080
+    spells-service:
+        host: spells
+        port: 8080
+    items-service:
+      host: items
+      port: 8080
+    stats-service:
+      host: stats
+      port: 8080
+    eureka-server: eureka
+    auth-server: auth-server  

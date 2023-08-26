@@ -1,0 +1,435 @@
+{
+	"info": {
+		"_postman_id": "6ec57dfa-eb9f-4a94-9ed6-b764f5f49fce",
+		"name": "Dnd apis",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25975966"
+	},
+	"item": [
+		{
+			"name": "Create Character",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"mita\",\r\n    \"race\": \"bla\",\r\n    \"religion\": \"Sacred\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/characters",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"characters"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Assign Stats to Character",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n        \"name\": \"HP\",\r\n        \"value\": 122\r\n    },\r\n    {\r\n        \"name\": \"AC\",\r\n        \"value\": 12\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/characters/648e0b8f72713c284e6bc7cb/stats",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"characters",
+						"648e0b8f72713c284e6bc7cb",
+						"stats"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get items",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ2bGFkYSIsImV4cCI6MjI5MzA1ODIzNCwiYXV0aG9yaXRpZXMiOlsiUk9MRV9VU0VSIl0sImp0aSI6InRLaVN1U2k2MUdZeE1XRzB2QXBtbTM1cTdEcz0iLCJjbGllbnRfaWQiOiJ3cml0ZXIiLCJzY29wZSI6WyJjaGFyYWN0ZXI6cmVhZCIsImNoYXJhY3Rlcjp3cml0ZSJdfQ.YDf2qW5evqt8OyOrWgK7L0Kyyom-mxP5QH3RQ-9BmB-Rc2UxqFl5EBQhqLTy9-s0W4GkTIAR_VbtUZIgx7457PW6z9lgcueH4GkEy3DJd3RMcmAN4zGxYVJGza6aFFo11Q7QR86UNxaGAwqiurddlPoaI5X8o5RTp1XOV5l83oAcPMlmNK_n7V7SUkCl0sZvm4vaOdUBmBTYiA7VdJo5-lBpFIg8b8tWVTJIOrGA6hEY684Ogg9ifbRu8C6CBL2-9PLoDYOZtyPHC_MW4PfXBT35TNFyVhrmigpQFLJBWhLNcGlfuynP1f2_N0lGOk6OzyeLvaQx7_3M9C9az4--ig",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8443/items",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"items"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get character inventory",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8443/characters/64cbf360e6eb07575c541156/inventory",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"characters",
+						"64cbf360e6eb07575c541156",
+						"inventory"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Modify character inventory",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "    {\r\n      \"itemId\": 1,\r\n      \"amount\": 1,\r\n      \"modificationType\": \"ADD\"\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/characters/64cbf360e6eb07575c541156/inventory",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"characters",
+						"64cbf360e6eb07575c541156",
+						"inventory"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Item",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/items/testItem",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"items",
+						"testItem"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Item Copy",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8443/items/dagger-1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"items",
+						"dagger-1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create item inv",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/characters/233232/inventory",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"characters",
+						"233232",
+						"inventory"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create item inv Copy",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"itemId\": \"38\",\r\n    \"amount\": \"10\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/characters/233232/inventory",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"characters",
+						"233232",
+						"inventory"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get spell",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ2bGFkYSIsImV4cCI6MjI5MzA1ODIzNCwiYXV0aG9yaXRpZXMiOlsiUk9MRV9VU0VSIl0sImp0aSI6InRLaVN1U2k2MUdZeE1XRzB2QXBtbTM1cTdEcz0iLCJjbGllbnRfaWQiOiJ3cml0ZXIiLCJzY29wZSI6WyJjaGFyYWN0ZXI6cmVhZCIsImNoYXJhY3Rlcjp3cml0ZSJdfQ.YDf2qW5evqt8OyOrWgK7L0Kyyom-mxP5QH3RQ-9BmB-Rc2UxqFl5EBQhqLTy9-s0W4GkTIAR_VbtUZIgx7457PW6z9lgcueH4GkEy3DJd3RMcmAN4zGxYVJGza6aFFo11Q7QR86UNxaGAwqiurddlPoaI5X8o5RTp1XOV5l83oAcPMlmNK_n7V7SUkCl0sZvm4vaOdUBmBTYiA7VdJo5-lBpFIg8b8tWVTJIOrGA6hEY684Ogg9ifbRu8C6CBL2-9PLoDYOZtyPHC_MW4PfXBT35TNFyVhrmigpQFLJBWhLNcGlfuynP1f2_N0lGOk6OzyeLvaQx7_3M9C9az4--ig",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8443/spells/acid-arrow",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"spells",
+						"acid-arrow"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get character spells",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8443/characters/64dc755fb1c26230513f06ab/spells",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"characters",
+						"64dc755fb1c26230513f06ab",
+						"spells"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Character",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ2bGFkYSIsImV4cCI6MjI5MzA1ODIzNCwiYXV0aG9yaXRpZXMiOlsiUk9MRV9VU0VSIl0sImp0aSI6InRLaVN1U2k2MUdZeE1XRzB2QXBtbTM1cTdEcz0iLCJjbGllbnRfaWQiOiJ3cml0ZXIiLCJzY29wZSI6WyJjaGFyYWN0ZXI6cmVhZCIsImNoYXJhY3Rlcjp3cml0ZSJdfQ.YDf2qW5evqt8OyOrWgK7L0Kyyom-mxP5QH3RQ-9BmB-Rc2UxqFl5EBQhqLTy9-s0W4GkTIAR_VbtUZIgx7457PW6z9lgcueH4GkEy3DJd3RMcmAN4zGxYVJGza6aFFo11Q7QR86UNxaGAwqiurddlPoaI5X8o5RTp1XOV5l83oAcPMlmNK_n7V7SUkCl0sZvm4vaOdUBmBTYiA7VdJo5-lBpFIg8b8tWVTJIOrGA6hEY684Ogg9ifbRu8C6CBL2-9PLoDYOZtyPHC_MW4PfXBT35TNFyVhrmigpQFLJBWhLNcGlfuynP1f2_N0lGOk6OzyeLvaQx7_3M9C9az4--ig",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8443/characters/64dc755fb1c26230513f06ab",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"characters",
+						"64dc755fb1c26230513f06ab"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Character Stats",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8443/characters/648e0b8f72713c284e6bc7cb",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"characters",
+						"648e0b8f72713c284e6bc7cb"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check Health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8443/actuator/health",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"actuator",
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create composite character",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"John DDdD24\",\r\n  \"race\": \"Human\",\r\n  \"religion\": \"None\",\r\n  \"serviceAddress\": \"123 Main St\",\r\n  \"items\": [\r\n    {\r\n      \"id\": 1,\r\n      \"amount\": 1\r\n    }\r\n  ],\r\n  \"spells\": [\r\n    {\r\n      \"spellName\": \"acid-arrow\",\r\n      \"spellLevel\": 3\r\n    }\r\n  ],\r\n  \"stats\": [\r\n    {\r\n      \"name\": \"HP\",\r\n      \"value\": 10\r\n    }\r\n  ]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/characters",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"characters"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Item",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ2bGFkYSIsImV4cCI6MjI5MzA1ODIzNCwiYXV0aG9yaXRpZXMiOlsiUk9MRV9VU0VSIl0sImp0aSI6InRLaVN1U2k2MUdZeE1XRzB2QXBtbTM1cTdEcz0iLCJjbGllbnRfaWQiOiJ3cml0ZXIiLCJzY29wZSI6WyJjaGFyYWN0ZXI6cmVhZCIsImNoYXJhY3Rlcjp3cml0ZSJdfQ.YDf2qW5evqt8OyOrWgK7L0Kyyom-mxP5QH3RQ-9BmB-Rc2UxqFl5EBQhqLTy9-s0W4GkTIAR_VbtUZIgx7457PW6z9lgcueH4GkEy3DJd3RMcmAN4zGxYVJGza6aFFo11Q7QR86UNxaGAwqiurddlPoaI5X8o5RTp1XOV5l83oAcPMlmNK_n7V7SUkCl0sZvm4vaOdUBmBTYiA7VdJo5-lBpFIg8b8tWVTJIOrGA6hEY684Ogg9ifbRu8C6CBL2-9PLoDYOZtyPHC_MW4PfXBT35TNFyVhrmigpQFLJBWhLNcGlfuynP1f2_N0lGOk6OzyeLvaQx7_3M9C9az4--ig",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"sword123232\",\r\n    \"description\": \"pointy\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8443/items",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8443",
+					"path": [
+						"items"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

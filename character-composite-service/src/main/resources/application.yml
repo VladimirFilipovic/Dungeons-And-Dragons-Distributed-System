@@ -60,17 +60,21 @@ app:
   stats-service:
     host: localhost
     port: 8084
-
+  eureka-username: u
+  eureka-password: p
+  eureka-server: localhost
+  auth-server: localhost
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: "http://${app.eureka-username}:${app.eureka-password}@${app.eureka-server}:8761/eureka/"
     initialInstanceInfoReplicationIntervalSeconds: 5
     registryFetchIntervalSeconds: 5
   instance:
     leaseRenewalIntervalInSeconds: 5
     leaseExpirationDurationInSeconds: 5
+
 
 ribbon.ServerListRefreshInterval: 5000
 
@@ -102,6 +106,11 @@ spring:
         binder:
           brokers: 127.0.0.1
           defaultBrokerPort: 9092
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://${app.auth-server}:9999/.well-known/jwks.json
 
   rabbitmq:
     host: 127.0.0.1
@@ -142,11 +151,10 @@ app:
     stats-service:
       host: stats
       port: 8080
+    eureka-server: eureka
+    auth-server: auth-server  
  
 server:
     port: 8080
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://eureka:8761/eureka/
+app.eureka-server: eureka

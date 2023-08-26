@@ -4,15 +4,21 @@ management.endpoints.web.exposure.include: "*"
 # Strongly recommend to set this property to "none" in a production environment!
 spring.jpa.hibernate.ddl-auto: update
 
+app:
+  eureka-username: u
+  eureka-password: p
+  eureka-server: localhost
+
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: "http://${app.eureka-username}:${app.eureka-password}@${app.eureka-server}:8761/eureka/"
     initialInstanceInfoReplicationIntervalSeconds: 5
     registryFetchIntervalSeconds: 5
   instance:
     leaseRenewalIntervalInSeconds: 5
     leaseExpirationDurationInSeconds: 5
+
 
 spring:
   application:
@@ -81,7 +87,4 @@ server:
   port: 8080
 
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://eureka:8761/eureka/
+app.eureka-server: eureka

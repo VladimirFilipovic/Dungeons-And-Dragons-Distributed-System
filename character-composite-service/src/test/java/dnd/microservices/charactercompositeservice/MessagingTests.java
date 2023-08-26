@@ -50,7 +50,10 @@ import java.util.concurrent.BlockingQueue;
 
 @AutoConfigureWebTestClient(timeout = "36000")
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT,properties ={"eureka.client.enabled=false"})
+@SpringBootTest(
+	webEnvironment=RANDOM_PORT,
+	classes = {CharacterCompositeServiceApplication.class, TestSecurityConfig.class },
+	properties = {"spring.main.allow-bean-definition-overriding=true","eureka.client.enabled=false"})
 public class MessagingTests {
     private static final String CHARACTER_ID_OK = "1";
     private static final String CHARACTER_ID_NOT_FOUND = "2";

@@ -107,10 +107,10 @@ public class IntegrationService implements CharacterService, ItemsService, Inven
                 this.restTemplate = restTemplate;
 
                 mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-                this.characterServiceUrl = "http://api-characters/characters";
-                this.inventoryServiceUrl = "http://api-inventory";
-                this.spellsServiceUrl = "http://api-spells";
-                this.statsServiceUrl = "http://api-stats";
+                this.characterServiceUrl = "https://api-characters/characters";
+                this.inventoryServiceUrl = "https://api-inventory";
+                this.spellsServiceUrl = "https://api-spells";
+                this.statsServiceUrl = "https://api-stats";
                 this.statsServiceHost = "api-stats";
                 this.spellsServiceHost = "api-spells";
                 this.inventoryServiceHost = "api-inventory";

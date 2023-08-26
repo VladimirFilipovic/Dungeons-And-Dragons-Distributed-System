@@ -9,7 +9,7 @@
 #   HOST=localhost PORT=7000 ./test-em-all.bash
 #
 : ${HOST=localhost}
-: ${PORT=8080}
+: ${PORT=8443}
 : ${CHAR_ID=0}
 
 function assertCurl() {
@@ -85,10 +85,11 @@ function testCompositeCreated() {
 
     #create item
     itemBody='{
-    "name": "Magic-Staffs",
-    "description": "A powerful staff"
+    "name": "Magic-Wands-lvl-12",
+    "description": "A powerful wand lvl 12"
     }'
-    item=$(curl -X POST http://$HOST:$PORT/items  -H "Content-Type: application/json" --data "$itemBody")
+    item=$(curl $AUTH -X  POST -k https://$HOST:$PORT/items  -H "Content-Type: application/json"  -H "Authorization: Bearer $ACCESS_TOKEN" --data "$itemBody")
+
     itemId=$(echo "$item" | jq -r .id)
     itemName=$(echo "$item" | jq -r .name)
 
@@ -121,13 +122,13 @@ function testCompositeCreated() {
     }'
 
     #create character   
-    character=$(curl -X POST http://$HOST:$PORT/characters/ -H "Content-Type: application/json" --data "$body")
+    character=$(curl  -X  POST -k https://$HOST:$PORT/characters/ -H "Content-Type: application/json" -H "Authorization: Bearer $ACCESS_TOKEN" --data "$body")
 
     echo "Character: $character"
 
     characterId=$(echo $character | jq -r '.character.id')
 
-    if ! assertCurl 200 "curl http://$HOST:$PORT/characters/$characterId -s"
+    if ! assertCurl 200 "curl -k  https://$HOST:$PORT/characters/$characterId $AUTH -s"
     then
         echo -n "FAIL"
         return 1
@@ -153,8 +154,8 @@ function testCompositeCreated() {
 
 
     #delete character and item
-    assertCurl 200 "curl -X DELETE http://$HOST:$PORT/characters/$characterId -s"
-    assertCurl 200 "curl -X DELETE http://$HOST:$PORT/items/$itemName -s"
+    assertCurl 200 "curl $AUTH -X DELETE -k https://$HOST:$PORT/characters/$characterId -s"
+    assertCurl 200 "curl $AUTH -X DELETE -k https://$HOST:$PORT/items/$itemName -s"
 
     set -e
 }
@@ -163,6 +164,14 @@ function waitForMessageProcessing() {
     echo "Wait for messages to be processed... "
 
     # Give background processing some time to complete...
+    sleep 1
+
+    ACCESS_TOKEN=$(curl -k https://writer:secret@$HOST:$PORT/oauth/token -d grant_type=password -d username=vlada -d password=password -s | jq .access_token -r)
+    AUTH="-H \"Authorization: Bearer $ACCESS_TOKEN\""
+
+    echo "AUTH: $AUTH"
+    
+
     sleep 1
 
     n=0
@@ -197,7 +206,12 @@ then
     docker-compose up -d
 fi
 
-waitForService curl http://$HOST:$PORT/actuator/health
+waitForService curl -k https://$HOST:$PORT/actuator/health
+
+ACCESS_TOKEN=$(curl -k https://writer:secret@$HOST:$PORT/oauth/token -d grant_type=password -d username=vlada -d password=password -s | jq .access_token -r)
+AUTH="-H \"Authorization: Bearer $ACCESS_TOKEN\"" 
+
+echo "AUTH: $AUTH"
 
 testCompositeCreated
 

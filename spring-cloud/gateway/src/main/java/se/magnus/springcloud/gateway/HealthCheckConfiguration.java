@@ -35,7 +35,7 @@ public class HealthCheckConfiguration {
     ReactiveHealthIndicator healthcheckMicroservices() {
 
         ReactiveHealthIndicatorRegistry registry = new DefaultReactiveHealthIndicatorRegistry(new LinkedHashMap<>());
-
+        registry.register("auth-server",       () -> getHealth("http://auth-server"));
         registry.register("stats",           () -> getHealth("http://api-stats"));
         registry.register("spells",    () -> getHealth("http://api-spells"));
         registry.register("inventory",            () -> getHealth("http://api-inventory"));
